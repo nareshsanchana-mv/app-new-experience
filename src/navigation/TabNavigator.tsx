@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../theme/colors';
 
-import TodayScreen from '../screens/TodayScreen';
+import NewTodayScreen from '../screens/NewTodayScreen';
 import ProgramsScreen from '../screens/ProgramsScreen';
 import EveAIScreen from '../screens/EveAIScreen';
 import MeditationsScreen from '../screens/MeditationsScreen';
@@ -44,7 +44,7 @@ export default function TabNavigator() {
     >
       <Tab.Screen
         name="Today"
-        component={TodayScreen}
+        component={NewTodayScreen}
         options={{
           tabBarIcon: ({ focused }) =>
             focused ? (

@@ -3,17 +3,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform, View, StyleSheet } from 'react-native';
 import { UserProvider } from './src/context/UserContext';
+import { DemoProvider } from './src/context/DemoContext';
 import RootNavigator from './src/navigation/RootNavigator';
 
 function AppContent() {
   return (
     <UserProvider>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <StatusBar style="dark" />
-          <RootNavigator />
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <DemoProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <StatusBar style="dark" />
+            <RootNavigator />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </DemoProvider>
     </UserProvider>
   );
 }

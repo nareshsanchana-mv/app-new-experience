@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mindvalley-app",
-    "slug": "mindvalley-app",
+    "name": "App New Experience",
+    "slug": "app-new-experience",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
