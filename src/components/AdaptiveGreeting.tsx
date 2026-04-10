@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
+import { getProgramCover } from '../data/coverAssets';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 
@@ -56,7 +57,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
             onPress={() => onStartProgram(attributedProgram.id)}
           >
             <Image
-              source={{ uri: attributedProgram.image }}
+              source={getProgramCover(attributedProgram.id)}
               style={styles.heroProgramImage}
             />
             <View style={styles.heroProgramOverlay}>
@@ -133,7 +134,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
           onPress={() => onStartProgram(attributedProgram.id)}
         >
           <Image
-            source={{ uri: attributedProgram.image }}
+            source={getProgramCover(attributedProgram.id)}
             style={styles.continueImage}
           />
           <View style={styles.continueInfo}>

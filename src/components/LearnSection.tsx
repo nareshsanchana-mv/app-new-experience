@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { manifestingCollection, CollectionProgram } from '../data/manifestingCollection';
+import { getProgramCover } from '../data/coverAssets';
 import { useDemo } from '../context/DemoContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
@@ -94,7 +95,7 @@ function PhaseRow({ phase, programs, onProgramPress, currentProgramId, currentLe
               activeOpacity={0.8}
             >
               <Image
-                source={{ uri: program.image }}
+                source={getProgramCover(program.id)}
                 style={styles.programImage}
               />
               {hasProgress && (

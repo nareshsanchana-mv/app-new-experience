@@ -15,6 +15,7 @@ import {
   GoalCategory,
   Modality,
 } from '../data/meditationLibrary';
+import { getMeditationCover } from '../data/coverAssets';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 
@@ -110,7 +111,7 @@ export default function PracticeSection({ onMeditationPress }: PracticeSectionPr
             onPress={() => onMeditationPress(med.id, med.title, med.author, med.image, med.duration)}
             activeOpacity={0.8}
           >
-            <Image source={{ uri: med.image }} style={styles.meditationImage} />
+            <Image source={getMeditationCover(med.image)} style={styles.meditationImage} />
             <View style={styles.meditationInfo}>
               <View style={styles.modalityTag}>
                 <Text style={styles.modalityTagText}>{med.modality}</Text>
