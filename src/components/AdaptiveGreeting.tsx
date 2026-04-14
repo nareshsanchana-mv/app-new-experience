@@ -8,21 +8,24 @@ import {
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
 import { getProgramCover } from '../data/coverAssets';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { meditationCoversLocal } from '../data/coverAssets';
 
 interface AdaptiveGreetingProps {
   onTalkToEve: () => void;
   onStartProgram: (programId: string) => void;
   onChipPress: (chip: string) => void;
+  onPlayMeditation?: (id: string, title: string, author: string, image: string, duration: string) => void;
 }
 
 const quickReplyChips = ['Stress relief', 'Personal growth', 'Spirituality', 'Just exploring'];
 
-export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPress }: AdaptiveGreetingProps) {
+export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPress, onPlayMeditation }: AdaptiveGreetingProps) {
   const { scenarioState, toggleDemoPanel } = useDemo();
   const tapCount = useRef(0);
   const lastTap = useRef(0);
@@ -72,9 +75,22 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.eveSecondary} onPress={onTalkToEve}>
-          <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
-          <Text style={styles.eveSecondaryText}>Something else on your mind? Talk to Eve</Text>
+        <TouchableOpacity onPress={onTalkToEve} activeOpacity={0.85}>
+          <LinearGradient
+            colors={['#6C5CE7', '#9B8FFF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.eveCta}
+          >
+            <View style={styles.eveCtaIcon}>
+              <Ionicons name="sparkles" size={18} color="#fff" />
+            </View>
+            <View style={styles.eveCtaContent}>
+              <Text style={styles.eveCtaTitle}>Talk to Eve</Text>
+              <Text style={styles.eveCtaSubtitle}>Something else on your mind?</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.7)" />
+          </LinearGradient>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -116,49 +132,90 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
     <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
       <Text style={styles.greeting}>Hi, {scenarioState.userName}</Text>
 
-      <View style={styles.returnGreetingCard}>
-        <View style={styles.eveAvatarSmall}>
-          <Ionicons name="sparkles" size={16} color={colors.primary} />
+      {/* Eve greeting + Ask Eve combined */}
+      <View style={styles.returnEveBlock}>
+        <View style={styles.returnGreetingCard}>
+          <View style={styles.eveAvatarSmall}>
+            <Ionicons name="sparkles" size={16} color={colors.primary} />
+          </View>
+          <View style={styles.returnGreetingContent}>
+            <Text style={styles.returnGreetingText}>{scenarioState.eveGreeting}</Text>
+            {scenarioState.socialProof && (
+              <Text style={styles.socialProofText}>{scenarioState.socialProof}</Text>
+            )}
+          </View>
         </View>
-        <View style={styles.returnGreetingContent}>
-          <Text style={styles.returnGreetingText}>{scenarioState.eveGreeting}</Text>
-          {scenarioState.socialProof && (
-            <Text style={styles.socialProofText}>{scenarioState.socialProof}</Text>
-          )}
-        </View>
+        <TouchableOpacity onPress={onTalkToEve} style={styles.askEveInline} activeOpacity={0.7}>
+          <Ionicons name="chatbubble-outline" size={14} color={colors.primary} />
+          <Text style={styles.askEveInlineText}>Ask Eve anything</Text>
+          <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
+      {/* Continue program card */}
       {attributedProgram && scenarioState.currentLesson > 0 && (
-        <TouchableOpacity
-          style={styles.continueCard}
-          onPress={() => onStartProgram(attributedProgram.id)}
-        >
-          <Image
-            source={getProgramCover(attributedProgram.id)}
-            style={styles.continueImage}
-          />
-          <View style={styles.continueInfo}>
-            <Text style={styles.continueTitle}>{attributedProgram.title}</Text>
-            <Text style={styles.continueLesson}>
-              Lesson {scenarioState.currentLesson + 1} of {scenarioState.totalLessons}
-            </Text>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${(scenarioState.currentLesson / scenarioState.totalLessons) * 100}%` },
-                ]}
-              />
-            </View>
+        <>
+          <View style={styles.continueSectionLabel}>
+            <Ionicons name="book" size={13} color={colors.primary} />
+            <Text style={styles.continueSectionLabelText}>Learn</Text>
           </View>
-          <Ionicons name="play-circle" size={36} color={colors.primary} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.continueCard}
+            onPress={() => onStartProgram(attributedProgram.id)}
+          >
+            <Image
+              source={getProgramCover(attributedProgram.id)}
+              style={styles.continueImage}
+            />
+            <View style={styles.continueInfo}>
+              <Text style={styles.continueTitle}>{attributedProgram.title}</Text>
+              <Text style={styles.continueLesson}>
+                Lesson {scenarioState.currentLesson + 1} of {scenarioState.totalLessons}
+              </Text>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${(scenarioState.currentLesson / scenarioState.totalLessons) * 100}%` },
+                  ]}
+                />
+              </View>
+            </View>
+            <Ionicons name="play-circle" size={36} color={colors.primary} />
+          </TouchableOpacity>
+        </>
       )}
 
-      <TouchableOpacity style={styles.eveSecondary} onPress={onTalkToEve}>
-        <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
-        <Text style={styles.eveSecondaryText}>Ask Eve anything</Text>
-      </TouchableOpacity>
+      {/* Last played meditation */}
+      {!scenarioState.isFirstVisit && scenarioState.currentLesson > 0 && (
+        <>
+          <View style={styles.continueSectionLabel}>
+            <Ionicons name="leaf" size={13} color={colors.teal} />
+            <Text style={[styles.continueSectionLabelText, { color: colors.teal }]}>Practice</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.continueCard}
+            onPress={() => onPlayMeditation?.(
+              'med-spirit-1',
+              '6-Phase Meditation',
+              'Vishen',
+              '/meditation-covers/6-Phase_Meditation.jpg',
+              '20 min',
+            )}
+          >
+            <Image
+              source={meditationCoversLocal['6-phase']}
+              style={styles.continueImage}
+            />
+            <View style={styles.continueInfo}>
+              <Text style={styles.continueTitle}>6-Phase Meditation</Text>
+              <Text style={styles.continueLesson}>Vishen · 20 min</Text>
+              <Text style={styles.lastPlayedHint}>Played yesterday</Text>
+            </View>
+            <Ionicons name="play-circle" size={36} color={colors.teal} />
+          </TouchableOpacity>
+        </>
+      )}
     </TouchableOpacity>
   );
 }
@@ -226,20 +283,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Eve secondary CTA
-  eveSecondary: {
+  // Eve gradient CTA
+  eveCta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 12,
+    gap: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 14,
   },
-  eveSecondaryText: {
-    ...typography.bodySmall,
-    color: colors.primary,
+  eveCtaIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eveCtaContent: {
     flex: 1,
+  },
+  eveCtaTitle: {
+    ...typography.label,
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  eveCtaSubtitle: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 1,
   },
 
   // Eve hero (Scenario 2)
@@ -299,14 +372,32 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Return visit greeting
+  // Return visit Eve block (greeting + ask eve combined)
+  returnEveBlock: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
   returnGreetingCard: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
     padding: 14,
-    marginBottom: 12,
     gap: 10,
+  },
+  askEveInline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    backgroundColor: `${colors.primary}08`,
+  },
+  askEveInlineText: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '600',
   },
   eveAvatarSmall: {
     width: 32,
@@ -328,6 +419,29 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     fontStyle: 'italic',
+  },
+
+  // Continue section labels
+  continueSectionLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 6,
+  },
+  continueSectionLabelText: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontSize: 11,
+  },
+  lastPlayedHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontSize: 11,
+    fontStyle: 'italic',
+    marginTop: 2,
   },
 
   // Continue card

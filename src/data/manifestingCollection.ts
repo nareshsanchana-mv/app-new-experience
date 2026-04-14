@@ -517,13 +517,13 @@ export const manifestingCollection: Collection = {
 // All programs flat list (for search, recommendations, etc.)
 export const allManifestingPrograms = manifestingPrograms;
 
-// Other collections (stubs for purchase flow — not built out)
+// All 5 collections — names match CSV Pathways, counts match actual program data
 export const allCollections = [
-  { id: 'manifesting', name: 'Manifesting Collection', price: 299, programCount: 33, owned: true },
-  { id: 'longevity', name: 'Longevity Collection', price: 299, programCount: 30, owned: false },
-  { id: 'career', name: 'Career & Impact Collection', price: 299, programCount: 28, owned: false },
-  { id: 'relationships', name: 'Love & Relationships Collection', price: 299, programCount: 25, owned: false },
-  { id: 'performance', name: 'Peak Performance Collection', price: 299, programCount: 27, owned: false },
+  { id: 'exponential-entrepreneur', name: 'Exponential Entrepreneur', price: 299, programCount: 32, owned: false },
+  { id: 'longevity', name: 'Longevity', price: 299, programCount: 17, owned: false },
+  { id: 'love-family', name: 'Love & Family', price: 299, programCount: 17, owned: false },
+  { id: 'manifesting', name: 'Manifesting', price: 299, programCount: 33, owned: true },
+  { id: 'speaking-authorship', name: 'Speaking & Authorship', price: 299, programCount: 17, owned: false },
 ];
 
 export const ALL_COLLECTIONS_PRICE = 899;

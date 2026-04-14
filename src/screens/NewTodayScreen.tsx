@@ -15,8 +15,10 @@ import PracticeSection from '../components/PracticeSection';
 import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
 import CollectionUpsell from '../components/CollectionUpsell';
+import ReflectionsCard from '../components/ReflectionsCard';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
+import { browseCollections } from '../data/allCollectionsData';
 import { colors } from '../theme/colors';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -27,6 +29,7 @@ export default function NewTodayScreen() {
   const { scenarioState } = useDemo();
   const [showEveChat, setShowEveChat] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellCollection, setUpsellCollection] = useState<string>('longevity');
   const [eveChatInitialMessage, setEveChatInitialMessage] = useState<string | undefined>();
 
   const handleStartProgram = (programId: string) => {
@@ -52,6 +55,16 @@ export default function NewTodayScreen() {
   };
 
   const handleProgramPress = (programId: string) => {
+    // Free user: all programs trigger upsell with the matching collection
+    if (scenarioState.id === 'free-user') {
+      const matchedCollection = browseCollections.find(c =>
+        c.programs.some(p => p.id === programId)
+      );
+      setUpsellCollection(matchedCollection?.slug ?? 'manifesting');
+      setShowUpsell(true);
+      return;
+    }
+
     const program = allManifestingPrograms.find(p => p.id === programId);
     if (!program) return;
 
@@ -97,6 +110,7 @@ export default function NewTodayScreen() {
           onTalkToEve={handleTalkToEve}
           onStartProgram={handleStartProgram}
           onChipPress={handleChipPress}
+          onPlayMeditation={handleMeditationPress}
         />
 
         {/* Divider */}
@@ -110,6 +124,18 @@ export default function NewTodayScreen() {
 
         {/* Practice Section — Meditation Library */}
         <PracticeSection onMeditationPress={handleMeditationPress} />
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Reflections — Daily Journal & Progress */}
+        <ReflectionsCard
+          onViewAll={() => navigation.navigate('Reflections')}
+          onTalkToEve={() => {
+            setEveChatInitialMessage(undefined);
+            setShowEveChat(true);
+          }}
+        />
 
         {/* Bottom padding */}
         <View style={styles.bottomPadding} />
@@ -135,7 +161,7 @@ export default function NewTodayScreen() {
       <CollectionUpsell
         visible={showUpsell}
         onClose={() => setShowUpsell(false)}
-        triggerCollection="longevity"
+        triggerCollection={upsellCollection}
       />
     </SafeAreaView>
   );
@@ -150,10 +176,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   divider: {
-    height: 8,
+    height: 1,
     backgroundColor: colors.border,
-    marginVertical: 4,
-    opacity: 0.3,
+    marginVertical: 8,
+    marginHorizontal: 20,
   },
   bottomPadding: {
     height: 100,

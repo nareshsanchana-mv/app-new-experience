@@ -28,7 +28,8 @@ interface EveChatProps {
 
 export default function EveChat({ onClose, initialMessage }: EveChatProps) {
   const { scenarioState } = useDemo();
-  const [messages, setMessages] = useState<ChatMessage[]>(() => getInitialMessages(scenarioState.id, initialMessage));
+  const userName = scenarioState.userName;
+  const [messages, setMessages] = useState<ChatMessage[]>(() => getInitialMessages(scenarioState.id, userName, initialMessage));
   const [inputText, setInputText] = useState('');
 
   const handleSend = () => {
@@ -143,13 +144,13 @@ export default function EveChat({ onClose, initialMessage }: EveChatProps) {
 }
 
 // Pre-scripted conversations per scenario
-function getInitialMessages(scenarioId: string, initialMessage?: string): ChatMessage[] {
+function getInitialMessages(scenarioId: string, userName: string, initialMessage?: string): ChatMessage[] {
   if (scenarioId === 'goal-question-stress') {
     return [
       {
         id: 'eve-1',
         sender: 'eve',
-        text: 'Hi Naresh! How can I help you today?',
+        text: `Hi ${userName}! How can I help you today?`,
       },
       {
         id: 'user-1',
@@ -177,7 +178,7 @@ function getInitialMessages(scenarioId: string, initialMessage?: string): ChatMe
       {
         id: 'eve-1',
         sender: 'eve',
-        text: "Great choice — 10X Fitness is one of our most popular programs. It's part of the Longevity Collection. Tap below to see how to add it to your plan.",
+        text: `Hi ${userName}! Great choice — 10X Fitness is one of our most popular programs. It's part of the Longevity Collection. Tap below to see how to add it to your plan.`,
       },
     ];
   }
@@ -187,22 +188,54 @@ function getInitialMessages(scenarioId: string, initialMessage?: string): ChatMe
       {
         id: 'eve-1',
         sender: 'eve',
-        text: "Hi Naresh! I'm Eve, your personal guide at Mindvalley. What brought you here today?",
+        text: `Hi ${userName}! I'm Eve, your personal guide at Mindvalley. What brought you here today?`,
       },
     ];
   }
 
   if (initialMessage) {
     return [
-      { id: 'eve-1', sender: 'eve', text: initialMessage },
+      { id: 'eve-1', sender: 'eve', text: `Hi ${userName}! ${initialMessage}` },
     ];
   }
 
+  // Default messages based on scenario type
+  if (scenarioId === 'new-user-silva-ad') {
+    return [
+      {
+        id: 'eve-1',
+        sender: 'eve',
+        text: `Hi ${userName}! I'm Eve, your personal guide at Mindvalley. I see you're starting with The Silva Ultramind System — great choice! Is there anything else I can help you with?`,
+      },
+    ];
+  }
+
+  if (scenarioId === 'returning-active') {
+    return [
+      {
+        id: 'eve-1',
+        sender: 'eve',
+        text: `Hi ${userName}! You're making great progress with Silva Ultramind. What's on your mind today?`,
+      },
+    ];
+  }
+
+  if (scenarioId === 'returning-inactive') {
+    return [
+      {
+        id: 'eve-1',
+        sender: 'eve',
+        text: `Hi ${userName}, welcome back! It's been a few days — no worries, picking up where you left off is easy. Want me to suggest what to do next?`,
+      },
+    ];
+  }
+
+  // Fallback for any other scenario
   return [
     {
       id: 'eve-1',
       sender: 'eve',
-      text: `Hi ${initialMessage || 'there'}! I'm Eve, your personal guide. How can I help you today?`,
+      text: `Hi ${userName}! What can I help you with today?`,
     },
   ];
 }

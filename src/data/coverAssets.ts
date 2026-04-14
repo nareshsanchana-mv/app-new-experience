@@ -2,6 +2,7 @@
 // React Native requires static require() calls for bundling
 
 export const programCovers: Record<string, any> = {
+  // === Manifesting Collection ===
   'sums': require('../../assets/covers/The_Silva_Ultramind_System.jpg'),
   'eld': require('../../assets/covers/Experience_Lucid_Dreaming.jpg'),
   'taap': require('../../assets/covers/The_Art_of_Astral_Projection.jpg'),
@@ -35,6 +36,24 @@ export const programCovers: Record<string, any> = {
   'fsl': require('../../assets/covers/Feng_Shui_for_Life.png'),
   'ajti': require('../../assets/covers/A_Journey_to_Infinitheism.jpg'),
   'up': require('../../assets/covers/Ultra_Presence.png'),
+
+  // === Exponential Entrepreneur Collection ===
+  'ub': require('../../assets/covers/Building_an_Unstoppable_Brand.jpg'),
+  'nwc': require('../../assets/covers/Negotiate_with_Confidence_Clarity_in_Every_Conversation.jpg'),
+  'meq': require('../../assets/covers/Money_EQ.png'),
+  'sb': require('../../assets/covers/Superbrain.png'),
+  '6pm': require('../../assets/covers/The_6_Phase_Meditation.jpg'),
+
+  // === Longevity Collection ===
+  '10xh': require('../../assets/covers/10X_Fitness.jpg'),
+  'tlb': require('../../assets/covers/The_Longevity_Blueprint.png'),
+  'wf': require('../../assets/covers/Wildfit.png'),
+
+  // === Love & Family Collection ===
+  'cpm': require('../../assets/covers/Conscious_Parenting_Mastery.png'),
+
+  // === Speaking & Authorship Collection ===
+  'sai': require('../../assets/covers/Speak_and_Inspire.png'),
 };
 
 // Meditation covers

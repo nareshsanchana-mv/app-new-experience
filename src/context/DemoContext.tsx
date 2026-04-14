@@ -6,7 +6,8 @@ export type DemoScenario =
   | 'returning-active'
   | 'returning-inactive'
   | 'browsing-unowned'
-  | 'goal-question-stress';
+  | 'goal-question-stress'
+  | 'free-user';
 
 export interface ScenarioState {
   id: DemoScenario;
@@ -129,6 +130,22 @@ const scenarios: Record<DemoScenario, ScenarioState> = {
     showEveHero: false,
     eveGreeting: 'Welcome back, Naresh. Ready for Lesson 3?',
     eveSubtext: '',
+  },
+  'free-user': {
+    id: 'free-user',
+    label: 'Free User — Browse All',
+    description: 'Free plan user browsing all 5 collections without ownership',
+    userName: 'Naresh',
+    hasAttribution: false,
+    isFirstVisit: false,
+    daysInactive: 0,
+    currentLesson: 0,
+    totalLessons: 0,
+    currentProgramTitle: '',
+    currentProgramId: '',
+    showEveHero: true,
+    eveGreeting: 'Hi Naresh! Explore all 5 collections and find your path.',
+    eveSubtext: 'Tap any program to learn more',
   },
 };
 

@@ -31,8 +31,15 @@ export default function PracticeSection({ onMeditationPress }: PracticeSectionPr
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Practice</Text>
-      <Text style={styles.sectionSubtitle}>Meditations, breathwork & more</Text>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <View style={styles.sectionIcon}>
+            <Ionicons name="leaf" size={18} color={colors.teal} />
+          </View>
+          <Text style={styles.sectionTitle}>Practice</Text>
+        </View>
+        <Text style={styles.sectionSubtitle}>Meditations, breathwork & more</Text>
+      </View>
 
       {/* Goal category chips */}
       <ScrollView
@@ -157,19 +164,35 @@ function getModalityIcon(modality: Modality): keyof typeof Ionicons.glyphMap {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 8,
+    paddingTop: 20,
     paddingBottom: 24,
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
+  sectionIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: `${colors.teal}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sectionTitle: {
     ...typography.h2,
     color: colors.textPrimary,
-    paddingHorizontal: 20,
   },
   sectionSubtitle: {
     ...typography.bodySmall,
     color: colors.textMuted,
-    paddingHorizontal: 20,
-    marginBottom: 12,
+    marginLeft: 42,
   },
   chipScrollContainer: {
     marginBottom: 8,
@@ -213,7 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   modalityChipActive: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: colors.primary,
   },
   modalityText: {
     ...typography.caption,
