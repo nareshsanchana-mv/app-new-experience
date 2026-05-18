@@ -281,7 +281,7 @@ export const meditationLibrary: PracticeMeditation[] = [
     modality: 'Visualization',
     goalCategories: ['Manifesting'],
     duration: '15 min',
-    image: '/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg',
+    image: '/meditation-covers/Manifesting_Health_Wealth_Love.jpg',
     bestTime: 'Morning',
   },
   {
@@ -291,7 +291,7 @@ export const meditationLibrary: PracticeMeditation[] = [
     modality: 'Breathwork',
     goalCategories: ['Manifesting'],
     duration: '18 min',
-    image: '/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg',
+    image: '/meditation-covers/Manifesting_Health_Wealth_Love.jpg',
     bestTime: 'Morning',
   },
 
@@ -357,7 +357,7 @@ export const meditationLibrary: PracticeMeditation[] = [
     modality: 'Meditation',
     goalCategories: ['Relationships'],
     duration: '18 min',
-    image: '/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg',
+    image: '/meditation-covers/Manifesting_Health_Wealth_Love.jpg',
     bestTime: 'Night',
   },
 ];

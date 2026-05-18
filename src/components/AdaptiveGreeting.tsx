@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
+  StyleProp,
   TouchableOpacity,
   Image,
-  TextInput,
+  ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
 import { getProgramCover } from '../data/coverAssets';
@@ -18,6 +18,7 @@ import { meditationCoversLocal } from '../data/coverAssets';
 
 interface AdaptiveGreetingProps {
   onTalkToEve: () => void;
+  onVoiceToEve: () => void;
   onStartProgram: (programId: string) => void;
   onChipPress: (chip: string) => void;
   onPlayMeditation?: (id: string, title: string, author: string, image: string, duration: string) => void;
@@ -25,7 +26,39 @@ interface AdaptiveGreetingProps {
 
 const quickReplyChips = ['Stress relief', 'Personal growth', 'Spirituality', 'Just exploring'];
 
-export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPress, onPlayMeditation }: AdaptiveGreetingProps) {
+function ComposerPill({
+  onTalkToEve,
+  onVoiceToEve,
+  placeholder = 'Message Eve…',
+  style,
+}: {
+  onTalkToEve: () => void;
+  onVoiceToEve: () => void;
+  placeholder?: string;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <TouchableOpacity
+      style={[styles.composerPill, style]}
+      onPress={onTalkToEve}
+      activeOpacity={0.7}
+    >
+      <View style={styles.composerAvatar}>
+        <Ionicons name="sparkles" size={14} color={colors.primary} />
+      </View>
+      <Text style={styles.composerPlaceholder}>{placeholder}</Text>
+      <TouchableOpacity
+        style={styles.composerMic}
+        onPress={onVoiceToEve}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons name="mic" size={18} color={colors.primary} />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+}
+
+export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartProgram, onChipPress, onPlayMeditation }: AdaptiveGreetingProps) {
   const { scenarioState, toggleDemoPanel } = useDemo();
   const tapCount = useRef(0);
   const lastTap = useRef(0);
@@ -52,7 +85,10 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
   if (scenarioState.isFirstVisit && scenarioState.hasAttribution) {
     return (
       <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
-        <Text style={styles.greeting}>Hi, {scenarioState.userName}</Text>
+        <Text style={styles.welcomeHeadline}>
+          Welcome to Mindvalley, {scenarioState.userName}!
+        </Text>
+        <Text style={styles.welcomeSubhead}>Your transformation starts now.</Text>
 
         {attributedProgram && (
           <TouchableOpacity
@@ -64,34 +100,37 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
               style={styles.heroProgramImage}
             />
             <View style={styles.heroProgramOverlay}>
-              <Text style={styles.heroProgramLabel}>START NOW</Text>
-              <Text style={styles.heroProgramTitle}>{attributedProgram.title}</Text>
-              <Text style={styles.heroProgramAuthor}>{attributedProgram.author}</Text>
+              <View>
+                <Text style={styles.heroProgramLabel}>START NOW</Text>
+                <Text style={styles.heroProgramTitle}>{attributedProgram.title}</Text>
+                <Text style={styles.heroProgramAuthor}>{attributedProgram.author}</Text>
+              </View>
               <View style={styles.playButton}>
-                <Ionicons name="play" size={20} color="#fff" />
+                <Ionicons name="play" size={20} color="#000" />
                 <Text style={styles.playButtonText}>Begin Lesson 1</Text>
               </View>
             </View>
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity onPress={onTalkToEve} activeOpacity={0.85}>
-          <LinearGradient
-            colors={['#6C5CE7', '#9B8FFF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.eveCta}
-          >
-            <View style={styles.eveCtaIcon}>
-              <Ionicons name="sparkles" size={18} color="#fff" />
+        <View style={styles.conversationStarter}>
+          <View style={styles.conversationHeader}>
+            <View style={styles.conversationAvatar}>
+              <Ionicons name="sparkles" size={20} color={colors.primary} />
             </View>
-            <View style={styles.eveCtaContent}>
-              <Text style={styles.eveCtaTitle}>Talk to Eve</Text>
-              <Text style={styles.eveCtaSubtitle}>Something else on your mind?</Text>
+            <View style={styles.conversationTitleWrap}>
+              <Text style={styles.conversationTitle}>Something else on your mind?</Text>
+              <Text style={styles.conversationSubtitle}>
+                Eve, your AI guide, is here to help you find your path.
+              </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.7)" />
-          </LinearGradient>
-        </TouchableOpacity>
+          </View>
+          <ComposerPill
+            onTalkToEve={onTalkToEve}
+            onVoiceToEve={onVoiceToEve}
+            style={styles.conversationComposer}
+          />
+        </View>
       </TouchableOpacity>
     );
   }
@@ -100,16 +139,21 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
   if (scenarioState.isFirstVisit && !scenarioState.hasAttribution) {
     return (
       <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
+        <Text style={styles.welcomeHeadline}>
+          Welcome to Mindvalley, {scenarioState.userName}!
+        </Text>
+        <Text style={styles.welcomeSubhead}>Your transformation starts now.</Text>
+
         <View style={styles.eveHeroSection}>
           <View style={styles.eveAvatar}>
             <Ionicons name="sparkles" size={24} color={colors.primary} />
           </View>
           <Text style={styles.eveHeroGreeting}>{scenarioState.eveGreeting}</Text>
 
-          <TouchableOpacity style={styles.chatInputFake} onPress={onTalkToEve}>
-            <Ionicons name="chatbubble-outline" size={18} color={colors.textMuted} />
-            <Text style={styles.chatInputPlaceholder}>Type your answer...</Text>
-          </TouchableOpacity>
+          <ComposerPill
+            onTalkToEve={onTalkToEve}
+            onVoiceToEve={onVoiceToEve}
+          />
 
           <View style={styles.chipRow}>
             {quickReplyChips.map((chip) => (
@@ -132,7 +176,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
     <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
       <Text style={styles.greeting}>Hi, {scenarioState.userName}</Text>
 
-      {/* Eve greeting + Ask Eve combined */}
+      {/* Eve greeting card */}
       <View style={styles.returnEveBlock}>
         <View style={styles.returnGreetingCard}>
           <View style={styles.eveAvatarSmall}>
@@ -145,12 +189,13 @@ export default function AdaptiveGreeting({ onTalkToEve, onStartProgram, onChipPr
             )}
           </View>
         </View>
-        <TouchableOpacity onPress={onTalkToEve} style={styles.askEveInline} activeOpacity={0.7}>
-          <Ionicons name="chatbubble-outline" size={14} color={colors.primary} />
-          <Text style={styles.askEveInlineText}>Ask Eve anything</Text>
-          <Ionicons name="chevron-forward" size={14} color={colors.primary} />
-        </TouchableOpacity>
       </View>
+
+      {/* Composer pill */}
+      <ComposerPill
+        onTalkToEve={onTalkToEve}
+        onVoiceToEve={onVoiceToEve}
+      />
 
       {/* Continue program card */}
       {attributedProgram && scenarioState.currentLesson > 0 && (
@@ -231,6 +276,16 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: 16,
   },
+  welcomeHeadline: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    marginBottom: 4,
+  },
+  welcomeSubhead: {
+    ...typography.body,
+    color: colors.textSecondary,
+    marginBottom: 16,
+  },
 
   // Hero program card (Scenario 1)
   heroProgramCard: {
@@ -247,7 +302,7 @@ const styles = StyleSheet.create({
   heroProgramOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: 16,
   },
   heroProgramLabel: {
@@ -265,12 +320,11 @@ const styles = StyleSheet.create({
   heroProgramAuthor: {
     ...typography.bodySmall,
     color: 'rgba(255,255,255,0.8)',
-    marginBottom: 12,
   },
   playButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    backgroundColor: '#fff',
     alignSelf: 'flex-start',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -279,40 +333,85 @@ const styles = StyleSheet.create({
   },
   playButtonText: {
     ...typography.label,
-    color: '#fff',
+    color: '#000',
     fontWeight: '600',
   },
 
-  // Eve gradient CTA
-  eveCta: {
+  // Composer pill (used across all scenarios)
+  composerPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 14,
+    gap: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: colors.surface,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 12,
   },
-  eveCtaIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  composerAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: `${colors.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  eveCtaContent: {
+  composerPlaceholder: {
+    ...typography.body,
+    color: colors.textMuted,
     flex: 1,
   },
-  eveCtaTitle: {
-    ...typography.label,
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 15,
+  composerMic: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${colors.primary}12`,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  eveCtaSubtitle: {
+
+  // Conversation starter frame (Scenario 1)
+  conversationStarter: {
+    backgroundColor: `${colors.primary}10`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}25`,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    marginTop: 12,
+  },
+  conversationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 14,
+  },
+  conversationAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${colors.primary}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  conversationTitleWrap: {
+    flex: 1,
+  },
+  conversationTitle: {
+    ...typography.h4,
+    color: colors.textPrimary,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  conversationSubtitle: {
     ...typography.caption,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 1,
+    color: colors.textSecondary,
+  },
+  conversationComposer: {
+    marginBottom: 0,
+    backgroundColor: colors.background,
   },
 
   // Eve hero (Scenario 2)
@@ -334,23 +433,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: 16,
-  },
-  chatInputFake: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    width: '100%',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-  },
-  chatInputPlaceholder: {
-    ...typography.body,
-    color: colors.textMuted,
   },
   chipRow: {
     flexDirection: 'row',
@@ -383,21 +465,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 14,
     gap: 10,
-  },
-  askEveInline: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: `${colors.primary}08`,
-  },
-  askEveInlineText: {
-    ...typography.caption,
-    color: colors.primary,
-    fontWeight: '600',
   },
   eveAvatarSmall: {
     width: 32,

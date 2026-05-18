@@ -56,6 +56,19 @@ export const programCovers: Record<string, any> = {
   'sai': require('../../assets/covers/Speak_and_Inspire.png'),
 };
 
+// Collection hero covers (keyed by collection slug)
+export const collectionCovers: Record<string, any> = {
+  'manifesting': require('../../assets/collections/manifesting.jpg'),
+  'speaking-authorship': require('../../assets/collections/speaking.jpg'),
+  'love-family': require('../../assets/collections/love-family.jpg'),
+  'exponential-entrepreneur': require('../../assets/collections/entrepreneur.jpg'),
+  'longevity': require('../../assets/collections/longevity.jpg'),
+};
+
+export function getCollectionCover(slug: string): any {
+  return collectionCovers[slug] ?? null;
+}
+
 // Meditation covers
 export const meditationCoversLocal: Record<string, any> = {
   'profound-sleep': require('../../assets/meditation-covers/Profound_Sleep.jpg'),
@@ -65,7 +78,9 @@ export const meditationCoversLocal: Record<string, any> = {
   'clarity-vision': require('../../assets/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg'),
   'abundance': require('../../assets/meditation-covers/Abundance_Meditation.jpg'),
   '6-phase': require('../../assets/meditation-covers/6-Phase_Meditation.jpg'),
-  'manifesting-hwl': require('../../assets/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg'),
+  'manifesting-hwl': require('../../assets/meditation-covers/Manifesting_Health_Wealth_Love.jpg'),
+  'sleep-body-scan': require('../../assets/meditation-covers/Sleep_Inducing_Body_Scan.jpg'),
+  'third-eye': require('../../assets/meditation-covers/Third_Eye_Chakra_Intuition_Wisdom.jpg'),
 };
 
 // Path-to-require map for meditation covers (maps the string paths used in meditationLibrary)
@@ -77,7 +92,7 @@ const meditationCoversByPath: Record<string, any> = {
   '/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg': require('../../assets/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg'),
   '/meditation-covers/Abundance_Meditation.jpg': require('../../assets/meditation-covers/Abundance_Meditation.jpg'),
   '/meditation-covers/6-Phase_Meditation.jpg': require('../../assets/meditation-covers/6-Phase_Meditation.jpg'),
-  '/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg': require('../../assets/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg'),
+  '/meditation-covers/Manifesting_Health_Wealth_Love.jpg': require('../../assets/meditation-covers/Manifesting_Health_Wealth_Love.jpg'),
 };
 
 // Helper to get program cover by id

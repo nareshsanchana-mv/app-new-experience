@@ -10,12 +10,11 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Header from '../components/Header';
 import AdaptiveGreeting from '../components/AdaptiveGreeting';
-import LearnSection from '../components/LearnSection';
+import LearnSection, { SilvaOwnedSection, SilvaExploreSection } from '../components/LearnSection';
 import PracticeSection from '../components/PracticeSection';
 import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
 import CollectionUpsell from '../components/CollectionUpsell';
-import ReflectionsCard from '../components/ReflectionsCard';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
 import { browseCollections } from '../data/allCollectionsData';
@@ -31,6 +30,13 @@ export default function NewTodayScreen() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellCollection, setUpsellCollection] = useState<string>('longevity');
   const [eveChatInitialMessage, setEveChatInitialMessage] = useState<string | undefined>();
+  const [eveChatVoiceMode, setEveChatVoiceMode] = useState(false);
+
+  const closeEveChat = () => {
+    setShowEveChat(false);
+    setEveChatVoiceMode(false);
+    setEveChatInitialMessage(undefined);
+  };
 
   const handleStartProgram = (programId: string) => {
     const program = allManifestingPrograms.find(p => p.id === programId);
@@ -46,11 +52,19 @@ export default function NewTodayScreen() {
 
   const handleTalkToEve = () => {
     setEveChatInitialMessage(undefined);
+    setEveChatVoiceMode(false);
+    setShowEveChat(true);
+  };
+
+  const handleVoiceToEve = () => {
+    setEveChatInitialMessage(undefined);
+    setEveChatVoiceMode(true);
     setShowEveChat(true);
   };
 
   const handleChipPress = (chip: string) => {
     setEveChatInitialMessage(`I'm interested in: ${chip}`);
+    setEveChatVoiceMode(false);
     setShowEveChat(true);
   };
 
@@ -68,8 +82,8 @@ export default function NewTodayScreen() {
     const program = allManifestingPrograms.find(p => p.id === programId);
     if (!program) return;
 
-    // If the program is not owned (for demo scenario 5), show upsell
-    if (!program.owned || scenarioState.id === 'browsing-unowned') {
+    // If the program is not owned, show upsell
+    if (!program.owned) {
       setShowUpsell(true);
       return;
     }
@@ -80,6 +94,11 @@ export default function NewTodayScreen() {
       questImage: program.image,
       author: program.author,
     });
+  };
+
+  const handleCollectionPress = (slug: string) => {
+    setUpsellCollection(slug);
+    setShowUpsell(true);
   };
 
   const handleMeditationPress = (
@@ -108,6 +127,7 @@ export default function NewTodayScreen() {
         {/* Adaptive AI Greeting */}
         <AdaptiveGreeting
           onTalkToEve={handleTalkToEve}
+          onVoiceToEve={handleVoiceToEve}
           onStartProgram={handleStartProgram}
           onChipPress={handleChipPress}
           onPlayMeditation={handleMeditationPress}
@@ -116,26 +136,35 @@ export default function NewTodayScreen() {
         {/* Divider */}
         <View style={styles.divider} />
 
-        {/* Learn Section — Collection Curriculum */}
-        <LearnSection onProgramPress={handleProgramPress} />
+        {scenarioState.id === 'new-user-silva-ad' ? (
+          <>
+            {/* Programs — owned Manifesting collection */}
+            <SilvaOwnedSection onProgramPress={handleProgramPress} />
 
-        {/* Divider */}
-        <View style={styles.divider} />
+            <View style={styles.divider} />
 
-        {/* Practice Section — Meditation Library */}
-        <PracticeSection onMeditationPress={handleMeditationPress} />
+            {/* Meditations & Sounds — top 10 */}
+            <PracticeSection onMeditationPress={handleMeditationPress} />
 
-        {/* Divider */}
-        <View style={styles.divider} />
+            <View style={styles.divider} />
 
-        {/* Reflections — Daily Journal & Progress */}
-        <ReflectionsCard
-          onViewAll={() => navigation.navigate('Reflections')}
-          onTalkToEve={() => {
-            setEveChatInitialMessage(undefined);
-            setShowEveChat(true);
-          }}
-        />
+            {/* Explore other collections */}
+            <SilvaExploreSection onCollectionPress={handleCollectionPress} />
+          </>
+        ) : (
+          <>
+            {/* Learn Section — Collection Curriculum */}
+            <LearnSection
+              onProgramPress={handleProgramPress}
+              onCollectionPress={handleCollectionPress}
+            />
+
+            <View style={styles.divider} />
+
+            {/* Practice Section — Meditation Library */}
+            <PracticeSection onMeditationPress={handleMeditationPress} />
+          </>
+        )}
 
         {/* Bottom padding */}
         <View style={styles.bottomPadding} />
@@ -149,11 +178,12 @@ export default function NewTodayScreen() {
         visible={showEveChat}
         animationType="slide"
         presentationStyle="pageSheet"
-        onRequestClose={() => setShowEveChat(false)}
+        onRequestClose={closeEveChat}
       >
         <EveChat
-          onClose={() => setShowEveChat(false)}
+          onClose={closeEveChat}
           initialMessage={eveChatInitialMessage}
+          startInVoiceMode={eveChatVoiceMode}
         />
       </Modal>
 

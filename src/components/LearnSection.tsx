@@ -10,24 +10,161 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { manifestingCollection, CollectionProgram } from '../data/manifestingCollection';
 import { browseCollections, BrowseCollection, BrowseProgram } from '../data/allCollectionsData';
-import { getProgramCover } from '../data/coverAssets';
+import { getProgramCover, getCollectionCover } from '../data/coverAssets';
 import { useDemo } from '../context/DemoContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 
 interface LearnSectionProps {
   onProgramPress: (programId: string) => void;
+  onCollectionPress?: (slug: string) => void;
 }
 
-export default function LearnSection({ onProgramPress }: LearnSectionProps) {
+export default function LearnSection({ onProgramPress, onCollectionPress }: LearnSectionProps) {
   const { scenarioState } = useDemo();
-  const isFreeUser = scenarioState.id === 'free-user';
 
-  if (isFreeUser) {
+  if (scenarioState.id === 'free-user') {
     return <BrowseAllCollections onProgramPress={onProgramPress} />;
   }
 
   return <OwnedCollectionView onProgramPress={onProgramPress} />;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEW SILVA USER: Subscription overview + explore other collections
+// ═══════════════════════════════════════════════════════════
+
+function pickHeroCoverForCollection(col: BrowseCollection): any {
+  for (const prog of col.programs) {
+    const cover = getProgramCover(prog.id);
+    if (cover) return cover;
+  }
+  return null;
+}
+
+export function SilvaOwnedSection({
+  onProgramPress,
+}: {
+  onProgramPress: (id: string) => void;
+}) {
+  const manifestingCol = browseCollections.find(c => c.slug === 'manifesting');
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <View style={[styles.sectionIcon, { backgroundColor: `${colors.gold}20` }]}>
+            <Ionicons name="book" size={18} color={colors.gold} />
+          </View>
+          <Text style={styles.sectionTitle}>Your Programs</Text>
+        </View>
+        <Text style={styles.sectionSubtitle}>Included in your subscription</Text>
+      </View>
+
+      <View style={[styles.ownedHeroCard, styles.ownedHeroCardSpaced]}>
+        <Image
+          source={getCollectionCover('manifesting')}
+          style={styles.ownedHeroImage}
+        />
+        <View style={styles.ownedHeroOverlay}>
+          <View style={styles.ownedBadge}>
+            <Ionicons name="checkmark-circle" size={13} color="#fff" />
+            <Text style={styles.ownedBadgeText}>Included</Text>
+          </View>
+          <View style={styles.ownedStatRow}>
+            <View style={styles.ownedStat}>
+              <Text style={styles.ownedStatNumber}>{manifestingCol?.programCount ?? 33}</Text>
+              <Text style={styles.ownedStatLabel}>programs</Text>
+            </View>
+            <View style={styles.ownedStatDivider} />
+            <View style={styles.ownedStat}>
+              <Text style={styles.ownedStatNumber}>1,000+</Text>
+              <Text style={styles.ownedStatLabel}>meditations &amp; sounds</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.allProgramsHeader}>
+        <Text style={styles.allProgramsTitle}>Manifesting Collection</Text>
+        <Text style={styles.allProgramsCount}>
+          {manifestingCol?.programCount ?? manifestingCollection.programCount} programs
+        </Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.programScroll}
+      >
+        {[...manifestingCollection.phases.Awaken, ...manifestingCollection.phases.Practice, ...manifestingCollection.phases.Embody].map((program) => (
+          <TouchableOpacity
+            key={program.id}
+            style={styles.programCard}
+            onPress={() => onProgramPress(program.id)}
+            activeOpacity={0.8}
+          >
+            <Image source={getProgramCover(program.id)} style={styles.programImage} />
+            <View style={styles.programInfo}>
+              <Text style={styles.programTitle} numberOfLines={2}>{program.title}</Text>
+              <Text style={styles.programAuthor} numberOfLines={1}>{program.author}</Text>
+              <View style={styles.programMeta}>
+                <Text style={styles.programMetaText}>{program.lessons} lessons</Text>
+                <Text style={styles.programMetaDot}>·</Text>
+                <Text style={styles.programMetaText}>{program.duration}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+export function SilvaExploreSection({
+  onCollectionPress,
+}: {
+  onCollectionPress?: (slug: string) => void;
+}) {
+  const otherCols = browseCollections.filter(c => c.slug !== 'manifesting');
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <View style={styles.sectionIcon}>
+            <Ionicons name="compass" size={18} color={colors.primary} />
+          </View>
+          <Text style={styles.sectionTitle}>Explore other collections</Text>
+        </View>
+        <Text style={styles.sectionSubtitle}>Add another collection to your plan</Text>
+      </View>
+
+      {otherCols.map((col) => {
+        const heroCover = getCollectionCover(col.slug) ?? pickHeroCoverForCollection(col);
+        return (
+          <TouchableOpacity
+            key={col.id}
+            style={styles.exploreCard}
+            onPress={() => onCollectionPress?.(col.slug)}
+            activeOpacity={0.85}
+          >
+            {heroCover ? (
+              <Image source={heroCover} style={styles.exploreCardImage} />
+            ) : (
+              <View style={[styles.exploreCardImage, { backgroundColor: col.color }]} />
+            )}
+            <View style={styles.exploreCardOverlay}>
+              <Text style={styles.exploreCardStats}>
+                {col.programCount} programs · ${col.price}/yr
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.85)" />
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -207,7 +344,7 @@ function OwnedCollectionView({ onProgramPress }: { onProgramPress: (id: string) 
       )}
 
       {/* Phase rows */}
-      {(['Foundation', 'Advanced', 'Mastery'] as const).map((phase) => (
+      {(['Awaken', 'Practice', 'Embody'] as const).map((phase) => (
         <PhaseRow
           key={phase}
           phase={phase}
@@ -230,7 +367,7 @@ interface PhaseRowProps {
 }
 
 function PhaseRow({ phase, programs, onProgramPress, currentProgramId, currentLesson }: PhaseRowProps) {
-  const phaseNumber = phase === 'Foundation' ? 1 : phase === 'Advanced' ? 2 : 3;
+  const phaseNumber = phase === 'Awaken' ? 1 : phase === 'Practice' ? 2 : 3;
 
   return (
     <View style={styles.phaseContainer}>
@@ -238,7 +375,7 @@ function PhaseRow({ phase, programs, onProgramPress, currentProgramId, currentLe
         <View style={styles.phaseBadge}>
           <Text style={styles.phaseBadgeText}>{phaseNumber}</Text>
         </View>
-        <Text style={styles.phaseTitle}>Manifesting {phase}</Text>
+        <Text style={styles.phaseTitle}>{phase}</Text>
         <Text style={styles.phaseCount}>{programs.length} programs</Text>
       </View>
 
@@ -577,5 +714,116 @@ const styles = StyleSheet.create({
   programMetaDot: {
     color: colors.textMuted,
     fontSize: 11,
+  },
+
+  // === Silva subscription view ===
+  ownedHeroCard: {
+    marginHorizontal: 20,
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
+  ownedHeroCardSpaced: {
+    marginBottom: 16,
+  },
+  allProgramsHeader: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  allProgramsTitle: {
+    ...typography.h4,
+    color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  allProgramsCount: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  ownedHeroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  ownedHeroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 16,
+    justifyContent: 'space-between',
+  },
+  ownedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(16, 185, 129, 0.85)',
+    borderRadius: 12,
+    alignSelf: 'flex-end',
+  },
+  ownedBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.3,
+  },
+  ownedStatRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  ownedStat: {
+    flexDirection: 'column',
+  },
+  ownedStatNumber: {
+    ...typography.h3,
+    color: '#fff',
+    fontWeight: '700',
+  },
+  ownedStatLabel: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 1,
+  },
+  ownedStatDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+
+  exploreCard: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    height: 200,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
+  exploreCardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  exploreCardOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  exploreCardStats: {
+    ...typography.label,
+    color: '#fff',
+    fontWeight: '600',
   },
 });

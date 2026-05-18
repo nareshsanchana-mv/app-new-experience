@@ -1,27 +1,30 @@
-// Cover image assets (served from public/ directory)
+// Cover image assets — local require() so they bundle into the native app.
+// Web build picks up the same files via the bundler; the previous /covers/...
+// string paths only worked on web (public/ served at root).
 const coverImages = {
-  silvaUltramind: '/covers/The_Silva_Ultramind_System.jpg',
-  superbrain: '/covers/Superbrain.png',
-  duality: '/covers/Duality.jpg',
-  wildfit: '/covers/Wildfit.png',
-  sixPhase: '/covers/The_6_Phase_Meditation.jpg',
-  fengShui: '/covers/Feng_Shui_for_Life.png',
-  beExtraordinary: '/covers/Be_Extraordinary.jpg',
-  manifestingMastery: '/covers/Manifesting_Mastery.jpg',
-  tenXFitness: '/covers/10X_Fitness.jpg',
-  yogiGuide: '/covers/A_Yogis_Guide_to_Joy.jpg',
-  moneyEQ: '/covers/Money_EQ.png',
-  speakInspire: '/covers/Speak_and_Inspire.png',
-  longevityBlueprint: '/covers/The_Longevity_Blueprint.png',
-  consciousParenting: '/covers/Conscious_Parenting_Mastery.png',
-  certifiedHypnotherapist: '/covers/Mindvalley_Certified_Hypnotherapist.jpg',
-  buildingBrand: '/covers/Building_an_Unstoppable_Brand.jpg',
-  gettingStarted: '/covers/Getting_Started_with_Mindvalley.jpg',
-  lifebook: '/covers/Lifebook.png',
-  artOfManifesting: '/covers/The_Art_of_Manifesting.png',
-  sleepMastery: '/covers/The_Mastery_of_Sleep.jpg',
-  negotiateConfidence: '/covers/Negotiate_with_Confidence_Clarity_in_Every_Conversation.jpg',
-  lifebookMastery: '/covers/Lifebook_Mastery.jpg',
+  silvaUltramind: require('../../assets/covers/The_Silva_Ultramind_System.jpg'),
+  superbrain: require('../../assets/covers/Superbrain.png'),
+  duality: require('../../assets/covers/Duality.jpg'),
+  wildfit: require('../../assets/covers/Wildfit.png'),
+  sixPhase: require('../../assets/covers/The_6_Phase_Meditation.jpg'),
+  fengShui: require('../../assets/covers/Feng_Shui_for_Life.png'),
+  beExtraordinary: require('../../assets/covers/Be_Extraordinary.jpg'),
+  manifestingMastery: require('../../assets/covers/Manifesting_Mastery.jpg'),
+  tenXFitness: require('../../assets/covers/10X_Fitness.jpg'),
+  yogiGuide: require('../../assets/covers/A_Yogis_Guide_to_Joy.jpg'),
+  moneyEQ: require('../../assets/covers/Money_EQ.png'),
+  speakInspire: require('../../assets/covers/Speak_and_Inspire.png'),
+  longevityBlueprint: require('../../assets/covers/The_Longevity_Blueprint.png'),
+  consciousParenting: require('../../assets/covers/Conscious_Parenting_Mastery.png'),
+  certifiedHypnotherapist: require('../../assets/covers/Mindvalley_Certified_Hypnotherapist.jpg'),
+  buildingBrand: require('../../assets/covers/Building_an_Unstoppable_Brand.jpg'),
+  gettingStarted: require('../../assets/covers/Getting_Started_with_Mindvalley.jpg'),
+  lifebook: require('../../assets/covers/Lifebook.png'),
+  artOfManifesting: require('../../assets/covers/The_Art_of_Manifesting.png'),
+  // No bundled cover for Sleep Mastery yet — fall back to longevity blueprint
+  sleepMastery: require('../../assets/covers/The_Longevity_Blueprint.png'),
+  negotiateConfidence: require('../../assets/covers/Negotiate_with_Confidence_Clarity_in_Every_Conversation.jpg'),
+  lifebookMastery: require('../../assets/covers/Lifebook_Mastery.jpg'),
 };
 
 // Sound cover images (served from public/sound-covers/ directory)
@@ -87,11 +90,11 @@ export function getSoundCover(name: string): string | null {
 
 // Meditation & sound cover images (served from public/ directory)
 const meditationCovers = {
-  manifestingHealthWealthLove: '/meditation-covers/Manifesting_Health,_Wealth_&_Love.jpg',
+  manifestingHealthWealthLove: '/meditation-covers/Manifesting_Health_Wealth_Love.jpg',
   releasingAnxiety: '/meditation-covers/Releasing_Anxiety.jpg',
   sleepInducingBodyScan: '/meditation-covers/Sleep_Inducing_Body_Scan.jpg',
   sinkBackIntoSleep: '/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg',
-  thirdEyeChakra: '/meditation-covers/Third_Eye_Chakra_Sounding_Intuition_&_Wisdom.jpg',
+  thirdEyeChakra: '/meditation-covers/Third_Eye_Chakra_Intuition_Wisdom.jpg',
   sixPhaseMeditation: '/meditation-covers/6-Phase_Meditation.jpg',
   deepRelaxation: '/meditation-covers/Deep_Relaxation.jpg',
   clarityOfVision: '/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg',
@@ -975,7 +978,7 @@ export const authorCollections = [
 
 export const programsByCategory: Record<string, Array<{
   id: string; title: string; author: string;
-  coverImage: string; enrolledCount: number; lessonCount: number;
+  coverImage: any; enrolledCount: number; lessonCount: number;
 }>> = {
   Mind: [
     { id: 'mind1', title: 'The Champion Mindset', author: 'Florencia Andres', coverImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80', enrolledCount: 12345, lessonCount: 20 },

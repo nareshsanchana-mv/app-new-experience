@@ -5,8 +5,6 @@ export type DemoScenario =
   | 'new-user-no-attribution'
   | 'returning-active'
   | 'returning-inactive'
-  | 'browsing-unowned'
-  | 'goal-question-stress'
   | 'free-user';
 
 export interface ScenarioState {
@@ -97,40 +95,6 @@ const scenarios: Record<DemoScenario, ScenarioState> = {
     eveGreeting: 'Welcome back, Naresh! You started The Silva Ultramind System 5 days ago. Want a quick recap of Lesson 1 before moving on?',
     eveSubtext: '',
   },
-  'browsing-unowned': {
-    id: 'browsing-unowned',
-    label: 'Browsing Unowned Content',
-    description: 'Triggers unowned content flow',
-    userName: 'Naresh',
-    hasAttribution: true,
-    attributedProgram: 'The Silva Ultramind System',
-    isFirstVisit: false,
-    daysInactive: 0,
-    currentLesson: 3,
-    totalLessons: 28,
-    currentProgramTitle: 'The Silva Ultramind System',
-    currentProgramId: 'sums',
-    showEveHero: false,
-    eveGreeting: 'Welcome back, Naresh. Ready for Lesson 4?',
-    eveSubtext: '',
-  },
-  'goal-question-stress': {
-    id: 'goal-question-stress',
-    label: 'Goal Question — Stress',
-    description: 'Pre-fills Eve with stress management question',
-    userName: 'Naresh',
-    hasAttribution: true,
-    attributedProgram: 'The Silva Ultramind System',
-    isFirstVisit: false,
-    daysInactive: 0,
-    currentLesson: 2,
-    totalLessons: 28,
-    currentProgramTitle: 'The Silva Ultramind System',
-    currentProgramId: 'sums',
-    showEveHero: false,
-    eveGreeting: 'Welcome back, Naresh. Ready for Lesson 3?',
-    eveSubtext: '',
-  },
   'free-user': {
     id: 'free-user',
     label: 'Free User — Browse All',
@@ -164,13 +128,17 @@ interface DemoProviderProps {
   children: ReactNode;
 }
 
+const DEFAULT_SCENARIO: DemoScenario = 'new-user-silva-ad';
+
 export function DemoProvider({ children }: DemoProviderProps) {
-  const [activeScenario, setActiveScenario] = useState<DemoScenario>('new-user-silva-ad');
+  const [activeScenario, setActiveScenario] = useState<DemoScenario>(DEFAULT_SCENARIO);
   const [isDemoPanelVisible, setIsDemoPanelVisible] = useState(false);
 
+  const resolvedScenario = scenarios[activeScenario] ?? scenarios[DEFAULT_SCENARIO];
+
   const value: DemoContextType = {
-    activeScenario,
-    scenarioState: scenarios[activeScenario],
+    activeScenario: resolvedScenario.id,
+    scenarioState: resolvedScenario,
     setActiveScenario,
     allScenarios: Object.values(scenarios).map(s => ({
       id: s.id,

@@ -15,7 +15,8 @@ import {
   GoalCategory,
   Modality,
 } from '../data/meditationLibrary';
-import { getMeditationCover } from '../data/coverAssets';
+import { getMeditationCover, meditationCoversLocal } from '../data/coverAssets';
+import { useDemo } from '../context/DemoContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 
@@ -23,9 +24,203 @@ interface PracticeSectionProps {
   onMeditationPress: (meditationId: string, title: string, author: string, image: string, duration: string) => void;
 }
 
+interface TopMeditation {
+  id: string;
+  coverKey: keyof typeof meditationCoversLocal;
+  imagePath: string;
+  title: string;
+  author: string;
+  duration: string;
+  rating: number;
+  ratingCount: number;
+}
+
+const topMeditations: TopMeditation[] = [
+  {
+    id: 'top-1',
+    coverKey: '6-phase',
+    imagePath: '/meditation-covers/6-Phase_Meditation.jpg',
+    title: '6 Phase Meditation',
+    author: 'Vishen',
+    duration: '20 min',
+    rating: 4.9,
+    ratingCount: 48213,
+  },
+  {
+    id: 'top-2',
+    coverKey: 'abundance',
+    imagePath: '/meditation-covers/Abundance_Meditation.jpg',
+    title: 'Abundance Meditation',
+    author: 'Marisa Peer',
+    duration: '15 min',
+    rating: 4.8,
+    ratingCount: 21407,
+  },
+  {
+    id: 'top-3',
+    coverKey: 'profound-sleep',
+    imagePath: '/meditation-covers/Profound_Sleep.jpg',
+    title: 'Profound Sleep',
+    author: 'Emily Fletcher',
+    duration: '25 min',
+    rating: 4.9,
+    ratingCount: 18934,
+  },
+  {
+    id: 'top-4',
+    coverKey: 'deep-relaxation',
+    imagePath: '/meditation-covers/Deep_Relaxation.jpg',
+    title: 'Deep Relaxation',
+    author: 'Niraj Naik',
+    duration: '18 min',
+    rating: 4.7,
+    ratingCount: 12608,
+  },
+  {
+    id: 'top-5',
+    coverKey: 'releasing-anxiety',
+    imagePath: '/meditation-covers/Releasing_Anxiety.jpg',
+    title: 'Releasing Anxiety',
+    author: 'Marisa Peer',
+    duration: '12 min',
+    rating: 4.8,
+    ratingCount: 15722,
+  },
+  {
+    id: 'top-6',
+    coverKey: 'clarity-vision',
+    imagePath: '/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg',
+    title: 'Clarity of Vision',
+    author: 'Regan Hillyer',
+    duration: '15 min',
+    rating: 4.7,
+    ratingCount: 8901,
+  },
+  {
+    id: 'top-7',
+    coverKey: 'manifesting-hwl',
+    imagePath: '/meditation-covers/Manifesting_Health_Wealth_Love.jpg',
+    title: 'Manifesting Health, Wealth & Love',
+    author: 'Regan Hillyer',
+    duration: '15 min',
+    rating: 4.8,
+    ratingCount: 11385,
+  },
+  {
+    id: 'top-8',
+    coverKey: 'sink-back',
+    imagePath: '/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg',
+    title: 'Sink Back Into Deeper Sleep',
+    author: 'House of Wellbeing',
+    duration: '20 min',
+    rating: 4.6,
+    ratingCount: 7264,
+  },
+  {
+    id: 'top-9',
+    coverKey: 'sleep-body-scan',
+    imagePath: '/meditation-covers/Sleep_Inducing_Body_Scan.jpg',
+    title: 'Sleep-Inducing Body Scan',
+    author: 'Emily Fletcher',
+    duration: '22 min',
+    rating: 4.7,
+    ratingCount: 9483,
+  },
+  {
+    id: 'top-10',
+    coverKey: 'third-eye',
+    imagePath: '/meditation-covers/Third_Eye_Chakra_Intuition_Wisdom.jpg',
+    title: 'Third Eye Chakra: Intuition & Wisdom',
+    author: 'Anodea Judith',
+    duration: '17 min',
+    rating: 4.7,
+    ratingCount: 6051,
+  },
+];
+
+function formatRatingCount(count: number): string {
+  if (count >= 1000) return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  return String(count);
+}
+
+function SilvaTopMeditationsView({
+  onMeditationPress,
+}: {
+  onMeditationPress: PracticeSectionProps['onMeditationPress'];
+}) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <View style={styles.sectionIcon}>
+            <Ionicons name="leaf" size={18} color={colors.teal} />
+          </View>
+          <Text style={styles.sectionTitle}>Your Meditations</Text>
+        </View>
+        <Text style={styles.sectionSubtitle}>Included in your subscription</Text>
+      </View>
+
+      {/* 1,000+ stat banner */}
+      <View style={styles.statBanner}>
+        <View style={styles.statBannerIcon}>
+          <Ionicons name="infinite" size={20} color={colors.teal} />
+        </View>
+        <View style={styles.statBannerContent}>
+          <Text style={styles.statBannerNumber}>1,000+</Text>
+          <Text style={styles.statBannerLabel}>meditations &amp; sounds included in your plan</Text>
+        </View>
+      </View>
+
+      {/* Top 10 sub-header */}
+      <View style={styles.topTenHeader}>
+        <Text style={styles.topTenTitle}>Our most popular meditations</Text>
+        <Text style={styles.topTenSubtitle}>Most loved by Mindvalley members</Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.topTenScroll}
+      >
+        {topMeditations.map((med, idx) => (
+          <TouchableOpacity
+            key={med.id}
+            style={styles.topCard}
+            onPress={() => onMeditationPress(med.id, med.title, med.author, med.imagePath, med.duration)}
+            activeOpacity={0.85}
+          >
+            <View style={styles.topCardImageWrap}>
+              <Image source={meditationCoversLocal[med.coverKey]} style={styles.topCardImage} />
+              <View style={styles.rankBadge}>
+                <Text style={styles.rankBadgeText}>{idx + 1}</Text>
+              </View>
+            </View>
+            <View style={styles.topCardInfo}>
+              <Text style={styles.topCardTitle} numberOfLines={2}>{med.title}</Text>
+              <Text style={styles.topCardAuthor} numberOfLines={1}>{med.author}</Text>
+              <View style={styles.topCardRatingRow}>
+                <Ionicons name="star" size={12} color={colors.gold} />
+                <Text style={styles.topCardRating}>{med.rating.toFixed(1)}</Text>
+                <Text style={styles.topCardRatingCount}>({formatRatingCount(med.ratingCount)})</Text>
+                <Text style={styles.topCardMetaDot}>·</Text>
+                <Text style={styles.topCardDuration}>{med.duration}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 export default function PracticeSection({ onMeditationPress }: PracticeSectionProps) {
+  const { scenarioState } = useDemo();
   const [selectedGoal, setSelectedGoal] = useState<string | undefined>(undefined);
   const [selectedModality, setSelectedModality] = useState<Modality | undefined>(undefined);
+
+  if (scenarioState.id === 'new-user-silva-ad') {
+    return <SilvaTopMeditationsView onMeditationPress={onMeditationPress} />;
+  }
 
   const filteredMeditations = filterMeditations(selectedGoal, selectedModality);
 
@@ -321,5 +516,131 @@ const styles = StyleSheet.create({
   emptyText: {
     ...typography.body,
     color: colors.textMuted,
+  },
+
+  // === Silva top-10 view ===
+  statBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: `${colors.teal}10`,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: `${colors.teal}30`,
+  },
+  statBannerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: `${colors.teal}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statBannerContent: {
+    flex: 1,
+  },
+  statBannerNumber: {
+    ...typography.h3,
+    color: colors.teal,
+    fontWeight: '700',
+  },
+  statBannerLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 1,
+  },
+  topTenHeader: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  topTenTitle: {
+    ...typography.h4,
+    color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  topTenSubtitle: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  topTenScroll: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  topCard: {
+    width: 180,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  topCardImageWrap: {
+    position: 'relative',
+  },
+  topCardImage: {
+    width: '100%',
+    height: 110,
+    backgroundColor: colors.border,
+  },
+  rankBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    minWidth: 28,
+    height: 28,
+    paddingHorizontal: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rankBadgeText: {
+    ...typography.caption,
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  topCardInfo: {
+    padding: 10,
+  },
+  topCardTitle: {
+    ...typography.label,
+    color: colors.textPrimary,
+    fontSize: 13,
+    marginBottom: 2,
+  },
+  topCardAuthor: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginBottom: 6,
+  },
+  topCardRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  topCardRating: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: '700',
+    fontSize: 11,
+  },
+  topCardRatingCount: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontSize: 11,
+  },
+  topCardMetaDot: {
+    color: colors.textMuted,
+    fontSize: 11,
+    marginHorizontal: 2,
+  },
+  topCardDuration: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontSize: 11,
   },
 });

@@ -24,33 +24,47 @@ interface ChatMessage {
 interface EveChatProps {
   onClose: () => void;
   initialMessage?: string;
+  startInVoiceMode?: boolean;
 }
 
-export default function EveChat({ onClose, initialMessage }: EveChatProps) {
+const MOCK_VOICE_TRANSCRIPT = 'I want to feel calmer today';
+
+export default function EveChat({ onClose, initialMessage, startInVoiceMode }: EveChatProps) {
   const { scenarioState } = useDemo();
   const userName = scenarioState.userName;
   const [messages, setMessages] = useState<ChatMessage[]>(() => getInitialMessages(scenarioState.id, userName, initialMessage));
   const [inputText, setInputText] = useState('');
+  const [voiceActive, setVoiceActive] = useState(!!startInVoiceMode);
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
+  const sendUserText = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: inputText.trim(),
+      text: trimmed,
     };
     setMessages(prev => [...prev, userMsg]);
-    setInputText('');
 
-    // Mock Eve response after brief delay
     setTimeout(() => {
       const eveReply: ChatMessage = {
         id: `eve-${Date.now()}`,
         sender: 'eve',
-        text: getMockReply(inputText.trim()),
+        text: getMockReply(trimmed),
       };
       setMessages(prev => [...prev, eveReply]);
     }, 800);
+  };
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    sendUserText(inputText);
+    setInputText('');
+  };
+
+  const handleVoiceStop = () => {
+    setVoiceActive(false);
+    sendUserText(MOCK_VOICE_TRANSCRIPT);
   };
 
   return (
@@ -125,64 +139,55 @@ export default function EveChat({ onClose, initialMessage }: EveChatProps) {
       </ScrollView>
 
       {/* Input */}
-      <View style={styles.inputBar}>
-        <TextInput
-          style={styles.input}
-          placeholder="Ask Eve anything..."
-          placeholderTextColor={colors.textMuted}
-          value={inputText}
-          onChangeText={setInputText}
-          onSubmitEditing={handleSend}
-          returnKeyType="send"
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <Ionicons name="send" size={20} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {voiceActive ? (
+        <View style={styles.voiceBar}>
+          <TouchableOpacity
+            style={styles.voiceCancelButton}
+            onPress={() => setVoiceActive(false)}
+          >
+            <Ionicons name="close" size={20} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <View style={styles.voiceListening}>
+            <View style={styles.voiceDot} />
+            <View style={[styles.voiceDot, styles.voiceDotMid]} />
+            <View style={styles.voiceDot} />
+            <Text style={styles.voiceText}>Listening…</Text>
+          </View>
+          <TouchableOpacity style={styles.voiceStopButton} onPress={handleVoiceStop}>
+            <Ionicons name="stop" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.inputBar}>
+          <TextInput
+            style={styles.input}
+            placeholder="Ask Eve anything..."
+            placeholderTextColor={colors.textMuted}
+            value={inputText}
+            onChangeText={setInputText}
+            onSubmitEditing={handleSend}
+            returnKeyType="send"
+          />
+          {inputText.trim().length === 0 ? (
+            <TouchableOpacity
+              style={styles.micButton}
+              onPress={() => setVoiceActive(true)}
+            >
+              <Ionicons name="mic" size={20} color={colors.primary} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+              <Ionicons name="send" size={20} color="#fff" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
 
 // Pre-scripted conversations per scenario
 function getInitialMessages(scenarioId: string, userName: string, initialMessage?: string): ChatMessage[] {
-  if (scenarioId === 'goal-question-stress') {
-    return [
-      {
-        id: 'eve-1',
-        sender: 'eve',
-        text: `Hi ${userName}! How can I help you today?`,
-      },
-      {
-        id: 'user-1',
-        sender: 'user',
-        text: 'How do I manage stress better?',
-      },
-      {
-        id: 'eve-2',
-        sender: 'eve',
-        text: "Here are the best practices for managing stress — some are already in your plan!",
-        badges: [
-          { title: 'Breathwork for Life — Lesson 5: Stress Release', owned: true },
-          { title: 'Mystic Brain — Lesson 8: Resilience to Stress', owned: true },
-          { title: 'Quick Stress & Worry Releaser (Meditation)', owned: true },
-          { title: 'Calm Mind: Managing Anxiety (Quest)', owned: true },
-          { title: 'Healing Burnout (Quest)', owned: false, collection: 'Longevity Collection' },
-          { title: '10X Fitness — Stress Recovery Module', owned: false, collection: 'Longevity Collection' },
-        ],
-      },
-    ];
-  }
-
-  if (scenarioId === 'browsing-unowned') {
-    return [
-      {
-        id: 'eve-1',
-        sender: 'eve',
-        text: `Hi ${userName}! Great choice — 10X Fitness is one of our most popular programs. It's part of the Longevity Collection. Tap below to see how to add it to your plan.`,
-      },
-    ];
-  }
-
   if (scenarioId === 'new-user-no-attribution') {
     return [
       {
@@ -254,7 +259,7 @@ function getMockReply(userText: string): string {
   if (lower.includes('manifest') || lower.includes('abundance')) {
     return "You're in the right collection! The Silva Ultramind System teaches powerful visualization techniques. I'd also recommend the Abundance Meditation by Bob Proctor as a daily practice.";
   }
-  return "That's a great question! Based on your Manifesting Collection, I'd suggest exploring the programs in your Foundation phase. Would you like me to recommend something specific?";
+  return "That's a great question! Based on your Manifesting Collection, I'd suggest exploring the programs in your Awaken phase. Would you like me to recommend something specific?";
 }
 
 const styles = StyleSheet.create({
@@ -400,6 +405,66 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  micButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${colors.primary}12`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  voiceBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: 12,
+  },
+  voiceCancelButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  voiceListening: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  voiceDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    opacity: 0.5,
+  },
+  voiceDotMid: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    opacity: 1,
+  },
+  voiceText: {
+    ...typography.body,
+    color: colors.primary,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  voiceStopButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
