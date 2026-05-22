@@ -7,6 +7,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { useReflections } from '../context/ReflectionsContext';
 
 const { width } = Dimensions.get('window');
 
@@ -229,8 +230,26 @@ export default function EveAIScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [conversationTitle, setConversationTitle] = useState('');
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(new Set());
   const scrollRef = useRef<ScrollView>(null);
   const isChat = messages.length > 0;
+  const { saveEveConversation } = useReflections();
+
+  const handleSaveToReflections = (msg: Message) => {
+    if (!msg.response || savedMessageIds.has(msg.id)) return;
+    const snippet = msg.response.body.length > 120
+      ? msg.response.body.slice(0, 117).trimEnd() + '…'
+      : msg.response.body;
+    saveEveConversation({
+      title: msg.response.title,
+      snippet,
+    });
+    setSavedMessageIds(prev => {
+      const next = new Set(prev);
+      next.add(msg.id);
+      return next;
+    });
+  };
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -351,6 +370,28 @@ export default function EveAIScreen() {
                         <Text style={styles.followUpText}>{q}</Text>
                       </TouchableOpacity>
                     ))}
+
+                    {/* Save to Reflections */}
+                    {(() => {
+                      const isSaved = savedMessageIds.has(msg.id);
+                      return (
+                        <TouchableOpacity
+                          style={[styles.saveReflectionBtn, isSaved && styles.saveReflectionBtnSaved]}
+                          onPress={() => handleSaveToReflections(msg)}
+                          activeOpacity={isSaved ? 1 : 0.85}
+                          disabled={isSaved}
+                        >
+                          <Ionicons
+                            name={isSaved ? 'checkmark-circle' : 'bookmark-outline'}
+                            size={16}
+                            color="#fff"
+                          />
+                          <Text style={styles.saveReflectionText}>
+                            {isSaved ? 'Saved to Reflections' : 'Save to Reflections'}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })()}
                   </View>
                 ) : null}
               </View>
@@ -517,6 +558,27 @@ const styles = StyleSheet.create({
     borderRadius: 10, paddingHorizontal: 16, paddingVertical: 14, marginBottom: 10,
   },
   followUpText: { fontSize: 14, color: '#fff' },
+
+  // Save to Reflections
+  saveReflectionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginTop: 6,
+  },
+  saveReflectionBtnSaved: {
+    backgroundColor: colors.success,
+  },
+  saveReflectionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
 
   // Input
   inputArea: { paddingHorizontal: 16, paddingBottom: 12, paddingTop: 8 },

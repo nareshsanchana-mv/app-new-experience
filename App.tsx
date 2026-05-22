@@ -4,18 +4,21 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Platform, View, StyleSheet } from 'react-native';
 import { UserProvider } from './src/context/UserContext';
 import { DemoProvider } from './src/context/DemoContext';
+import { ReflectionsProvider } from './src/context/ReflectionsContext';
 import RootNavigator from './src/navigation/RootNavigator';
 
 function AppContent() {
   return (
     <UserProvider>
       <DemoProvider>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <StatusBar style="dark" />
-            <RootNavigator />
-          </NavigationContainer>
-        </SafeAreaProvider>
+        <ReflectionsProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <StatusBar style="dark" />
+              <RootNavigator />
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </ReflectionsProvider>
       </DemoProvider>
     </UserProvider>
   );

@@ -10,11 +10,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
-  reflectionHistory,
   moodOptions,
   getActivityIcon,
   getActivityColor,
 } from '../data/reflectionsData';
+import { useReflections } from '../context/ReflectionsContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 
@@ -22,6 +22,7 @@ export default function ReflectionDayScreen() {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const { date } = route.params;
+  const { reflectionHistory } = useReflections();
 
   const day = reflectionHistory.find(d => d.date === date);
   if (!day) return null;

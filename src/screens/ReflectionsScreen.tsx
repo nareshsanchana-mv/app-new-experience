@@ -9,16 +9,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
-  reflectionHistory,
   moodOptions,
-  getReflectionStats,
   getActivityIcon,
   getActivityColor,
   ReflectionDay,
 } from '../data/reflectionsData';
+import { useReflections } from '../context/ReflectionsContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -31,7 +31,7 @@ export default function ReflectionsScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<ReflectionFilter>('all');
-  const stats = getReflectionStats();
+  const { reflectionHistory, stats } = useReflections();
 
   const sourceFilteredDays = reflectionHistory.filter((day) => {
     if (filter === 'mine') return day.hasUserInput;
@@ -69,23 +69,49 @@ export default function ReflectionsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Stats bar */}
-        <View style={styles.statsBar}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.currentStreak}</Text>
-            <Text style={styles.statLabel}>Day Streak</Text>
+        {/* Hero block */}
+        <LinearGradient
+          colors={['#2A1A4E', '#3D1F5C', '#1F1638']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          {/* Decorative glow */}
+          <View style={styles.heroGlow} pointerEvents="none">
+            <LinearGradient
+              colors={['rgba(224,64,251,0.30)', 'rgba(224,64,251,0)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroGlowInner}
+            />
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.daysWithInput}</Text>
-            <Text style={styles.statLabel}>Reflections</Text>
+
+          <View style={styles.heroIconBadge}>
+            <Ionicons name="journal" size={20} color={colors.gold} />
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.totalActivities}</Text>
-            <Text style={styles.statLabel}>Activities</Text>
+          <Text style={styles.heroTitle}>Your reflection journal</Text>
+          <Text style={styles.heroSubtitle}>
+            A space to notice what's shifting in you, one day at a time.
+          </Text>
+
+          {/* Stats inline */}
+          <View style={styles.statsBar}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.currentStreak}</Text>
+              <Text style={styles.statLabel}>Day streak</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.daysWithInput}</Text>
+              <Text style={styles.statLabel}>Reflections</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.totalActivities}</Text>
+              <Text style={styles.statLabel}>Activities</Text>
+            </View>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Filter pills */}
         <View style={styles.filterRow}>
@@ -259,16 +285,63 @@ const styles = StyleSheet.create({
     width: 36,
   },
 
-  // Stats
+  // Hero
+  hero: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(155,143,255,0.20)',
+    overflow: 'hidden',
+  },
+  heroGlow: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
+    height: 200,
+  },
+  heroGlowInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 100,
+  },
+  heroIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(245,200,66,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(245,200,66,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  heroTitle: {
+    ...typography.h2,
+    color: '#FFFFFF',
+    marginBottom: 6,
+  },
+  heroSubtitle: {
+    ...typography.bodySmall,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 19,
+    marginBottom: 18,
+  },
+
+  // Stats (inside hero)
   statsBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    backgroundColor: colors.backgroundElevated,
+    backgroundColor: 'rgba(0,0,0,0.30)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
     borderRadius: 14,
-    paddingVertical: 16,
+    paddingVertical: 14,
   },
   statItem: {
     flex: 1,
@@ -276,17 +349,17 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     ...typography.h3,
-    color: colors.textPrimary,
+    color: '#FFFFFF',
     marginBottom: 2,
   },
   statLabel: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: 'rgba(255,255,255,0.6)',
   },
   statDivider: {
     width: 1,
     height: 28,
-    backgroundColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
   // Search
@@ -344,13 +417,18 @@ const styles = StyleSheet.create({
 
   // Day cards
   dayCard: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-    backgroundColor: colors.backgroundElevated,
-    borderRadius: 14,
+    marginHorizontal: 16,
+    marginBottom: 10,
+    backgroundColor: colors.backgroundCard,
+    borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(155,143,255,0.10)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 4,
   },
   dayHeader: {
     flexDirection: 'row',
