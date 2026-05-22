@@ -127,6 +127,8 @@ export const programCovers: Record<string, any> = {
   'mbl': require('../../assets/covers/mbl.jpg'),
   'cp': require('../../assets/covers/cp.jpg'),
   'dbl': require('../../assets/covers/dbl.jpg'),
+  'tmgl': require('../../assets/covers/tmgl.jpg'),
+  '5rol': require('../../assets/covers/5rol.jpg'),
 };
 
 // Collection hero covers (keyed by collection slug)
