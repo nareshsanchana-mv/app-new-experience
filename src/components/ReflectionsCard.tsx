@@ -154,7 +154,7 @@ export default function ReflectionsCard({ onViewAll, onTalkToEve }: ReflectionsC
                       style={styles.chatEveGradient}
                     >
                       <Ionicons name="sparkles" size={16} color="#fff" />
-                      <Text style={styles.chatEveText}>Talk to Eve</Text>
+                      <Text style={styles.chatEveText}>Go deeper</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>

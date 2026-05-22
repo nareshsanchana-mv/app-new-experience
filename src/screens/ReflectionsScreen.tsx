@@ -25,18 +25,33 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+type ReflectionFilter = 'all' | 'mine' | 'eve';
+
 export default function ReflectionsScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState<ReflectionFilter>('all');
   const stats = getReflectionStats();
 
+  const sourceFilteredDays = reflectionHistory.filter((day) => {
+    if (filter === 'mine') return day.hasUserInput;
+    if (filter === 'eve') return day.eveConversations.length > 0;
+    return true;
+  });
+
   const filteredDays = searchQuery.trim()
-    ? reflectionHistory.filter(day =>
+    ? sourceFilteredDays.filter(day =>
         day.journalText?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         day.eveConversations.some(e => e.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
         day.activities.some(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()))
       )
-    : reflectionHistory;
+    : sourceFilteredDays;
+
+  const filterOptions: { id: ReflectionFilter; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { id: 'all', label: 'All', icon: 'apps-outline' },
+    { id: 'mine', label: 'Mine', icon: 'pencil' },
+    { id: 'eve', label: 'From Eve', icon: 'sparkles' },
+  ];
 
   const getMoodEmoji = (mood?: string) => {
     return moodOptions.find(m => m.mood === mood)?.emoji ?? '';
@@ -70,6 +85,30 @@ export default function ReflectionsScreen() {
             <Text style={styles.statNumber}>{stats.totalActivities}</Text>
             <Text style={styles.statLabel}>Activities</Text>
           </View>
+        </View>
+
+        {/* Filter pills */}
+        <View style={styles.filterRow}>
+          {filterOptions.map((opt) => {
+            const active = filter === opt.id;
+            return (
+              <TouchableOpacity
+                key={opt.id}
+                style={[styles.filterPill, active && styles.filterPillActive]}
+                onPress={() => setFilter(opt.id)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={opt.icon}
+                  size={13}
+                  color={active ? colors.textPrimary : colors.textMuted}
+                />
+                <Text style={[styles.filterPillText, active && styles.filterPillTextActive]}>
+                  {opt.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Search */}
@@ -161,9 +200,29 @@ export default function ReflectionsScreen() {
 
         {filteredDays.length === 0 && (
           <View style={styles.emptyState}>
-            <Ionicons name="search-outline" size={40} color={colors.textMuted} />
-            <Text style={styles.emptyTitle}>No results found</Text>
-            <Text style={styles.emptySubtitle}>Try a different search term</Text>
+            <Ionicons
+              name={searchQuery.trim() ? 'search-outline' : filter === 'eve' ? 'sparkles-outline' : 'pencil'}
+              size={40}
+              color={colors.textMuted}
+            />
+            <Text style={styles.emptyTitle}>
+              {searchQuery.trim()
+                ? 'No results found'
+                : filter === 'eve'
+                ? 'No Eve conversations yet'
+                : filter === 'mine'
+                ? 'No journal entries yet'
+                : 'No reflections yet'}
+            </Text>
+            <Text style={styles.emptySubtitle}>
+              {searchQuery.trim()
+                ? 'Try a different search term'
+                : filter === 'eve'
+                ? 'Start a chat with Eve to see it here'
+                : filter === 'mine'
+                ? 'Add a mood or note to start your journal'
+                : 'Your reflections will appear here'}
+            </Text>
           </View>
         )}
 
@@ -249,6 +308,38 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textPrimary,
     fontSize: 14,
+  },
+
+  // Filter pills
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginHorizontal: 20,
+    marginBottom: 12,
+  },
+  filterPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  filterPillActive: {
+    backgroundColor: colors.backgroundElevated,
+    borderColor: colors.primary,
+  },
+  filterPillText: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  filterPillTextActive: {
+    color: colors.textPrimary,
   },
 
   // Day cards

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, ImageSourcePropType, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
@@ -7,7 +7,7 @@ interface ContinueProgramCardProps {
   programName: string;
   lessonTitle: string;
   author: string;
-  image: string;
+  image: string | ImageSourcePropType;
   progress: number;
   lessonsCompleted: number;
   totalLessons: number;
@@ -29,7 +29,10 @@ export default function ContinueProgramCard({
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: image }} style={styles.image} />
+        <Image
+          source={typeof image === 'string' ? { uri: image } : (image as ImageSourcePropType)}
+          style={styles.image}
+        />
         <View style={styles.overlay}>
           <Text style={styles.lessonTitle} numberOfLines={2}>{lessonTitle}</Text>
         </View>
