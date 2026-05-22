@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, FlatList, Image,
   Animated, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useReflections } from '../context/ReflectionsContext';
@@ -234,6 +234,9 @@ export default function EveAIScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const isChat = messages.length > 0;
   const { saveEveConversation } = useReflections();
+  const insets = useSafeAreaInsets();
+  // Floating tab bar = 64h + ~16 from bottom (uses safe-area inset). Clear it.
+  const tabBarClearance = Math.max(insets.bottom - 8, 16) + 64 + 12;
 
   const handleSaveToReflections = (msg: Message) => {
     if (!msg.response || savedMessageIds.has(msg.id)) return;
@@ -378,16 +381,21 @@ export default function EveAIScreen() {
                         <TouchableOpacity
                           style={[styles.saveReflectionBtn, isSaved && styles.saveReflectionBtnSaved]}
                           onPress={() => handleSaveToReflections(msg)}
-                          activeOpacity={isSaved ? 1 : 0.85}
+                          activeOpacity={isSaved ? 1 : 0.7}
                           disabled={isSaved}
                         >
                           <Ionicons
-                            name={isSaved ? 'checkmark-circle' : 'bookmark-outline'}
-                            size={16}
-                            color="#fff"
+                            name={isSaved ? 'checkmark' : 'bookmark-outline'}
+                            size={13}
+                            color={isSaved ? colors.success : colors.textSecondary}
                           />
-                          <Text style={styles.saveReflectionText}>
-                            {isSaved ? 'Saved to Reflections' : 'Save to Reflections'}
+                          <Text
+                            style={[
+                              styles.saveReflectionText,
+                              isSaved && { color: colors.success },
+                            ]}
+                          >
+                            {isSaved ? 'Saved' : 'Save to Reflections'}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -401,7 +409,7 @@ export default function EveAIScreen() {
         )}
 
         {/* Input area */}
-        <View style={styles.inputArea}>
+        <View style={[styles.inputArea, { paddingBottom: tabBarClearance }]}>
           {isRecording && (
             <View style={styles.recordingHint}>
               <Ionicons name="language-outline" size={13} color="#000" style={{ marginRight: 4 }} />
@@ -559,25 +567,28 @@ const styles = StyleSheet.create({
   },
   followUpText: { fontSize: 14, color: '#fff' },
 
-  // Save to Reflections
+  // Save to Reflections (tertiary action — small ghost pill)
   saveReflectionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginTop: 6,
+    alignSelf: 'flex-end',
+    gap: 5,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 10,
   },
   saveReflectionBtnSaved: {
-    backgroundColor: colors.success,
+    borderColor: 'transparent',
+    backgroundColor: `${colors.success}22`,
   },
   saveReflectionText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#fff',
+    color: colors.textSecondary,
   },
 
   // Input
