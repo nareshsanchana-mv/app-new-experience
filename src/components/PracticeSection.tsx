@@ -143,7 +143,7 @@ function formatRatingCount(count: number): string {
   return String(count);
 }
 
-function SilvaTopMeditationsView({
+function NewUserTopMeditationsView({
   onMeditationPress,
 }: {
   onMeditationPress: PracticeSectionProps['onMeditationPress'];
@@ -218,8 +218,8 @@ export default function PracticeSection({ onMeditationPress }: PracticeSectionPr
   const [selectedGoal, setSelectedGoal] = useState<string | undefined>(undefined);
   const [selectedModality, setSelectedModality] = useState<Modality | undefined>(undefined);
 
-  if (scenarioState.id === 'new-user-silva-ad') {
-    return <SilvaTopMeditationsView onMeditationPress={onMeditationPress} />;
+  if (scenarioState.id !== 'free-user') {
+    return <NewUserTopMeditationsView onMeditationPress={onMeditationPress} />;
   }
 
   const filteredMeditations = filterMeditations(selectedGoal, selectedModality);

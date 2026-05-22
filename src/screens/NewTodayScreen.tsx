@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Header from '../components/Header';
 import AdaptiveGreeting from '../components/AdaptiveGreeting';
-import LearnSection, { SilvaOwnedSection, SilvaExploreSection } from '../components/LearnSection';
+import LearnSection, { NewUserOwnedSection, NewUserExploreSection } from '../components/LearnSection';
 import PracticeSection from '../components/PracticeSection';
 import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
@@ -136,20 +136,20 @@ export default function NewTodayScreen() {
         {/* Divider */}
         <View style={styles.divider} />
 
-        {scenarioState.id === 'new-user-silva-ad' ? (
+        {scenarioState.id !== 'free-user' ? (
           <>
             {/* Programs — owned Manifesting collection */}
-            <SilvaOwnedSection onProgramPress={handleProgramPress} />
+            <NewUserOwnedSection onProgramPress={handleProgramPress} />
 
             <View style={styles.divider} />
 
-            {/* Meditations & Sounds — top 10 */}
+            {/* Meditations — top 10 */}
             <PracticeSection onMeditationPress={handleMeditationPress} />
 
             <View style={styles.divider} />
 
             {/* Explore other collections */}
-            <SilvaExploreSection onCollectionPress={handleCollectionPress} />
+            <NewUserExploreSection onCollectionPress={handleCollectionPress} />
           </>
         ) : (
           <>

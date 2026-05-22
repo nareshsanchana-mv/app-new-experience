@@ -42,7 +42,7 @@ function pickHeroCoverForCollection(col: BrowseCollection): any {
   return null;
 }
 
-export function SilvaOwnedSection({
+export function NewUserOwnedSection({
   onProgramPress,
 }: {
   onProgramPress: (id: string) => void;
@@ -121,7 +121,7 @@ export function SilvaOwnedSection({
   );
 }
 
-export function SilvaExploreSection({
+export function NewUserExploreSection({
   onCollectionPress,
 }: {
   onCollectionPress?: (slug: string) => void;
@@ -220,13 +220,18 @@ interface CollectionRowProps {
 }
 
 function CollectionRow({ collection, onProgramPress }: CollectionRowProps) {
+  const cover = getCollectionCover(collection.slug);
   return (
     <View style={styles.collectionContainer}>
       {/* Collection header */}
       <View style={styles.collectionHeaderRow}>
-        <View style={[styles.collectionIconBadge, { backgroundColor: `${collection.color}20` }]}>
-          <Ionicons name={collection.icon as any} size={16} color={collection.color} />
-        </View>
+        {cover ? (
+          <Image source={cover} style={styles.collectionHeaderImage} />
+        ) : (
+          <View style={[styles.collectionIconBadge, { backgroundColor: `${collection.color}20` }]}>
+            <Ionicons name={collection.icon as any} size={16} color={collection.color} />
+          </View>
+        )}
         <View style={styles.collectionHeaderText}>
           <Text style={styles.collectionName}>{collection.name}</Text>
           <Text style={styles.collectionMeta}>
@@ -526,6 +531,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  collectionHeaderImage: {
+    width: 72,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: colors.border,
   },
   collectionHeaderText: {
     flex: 1,

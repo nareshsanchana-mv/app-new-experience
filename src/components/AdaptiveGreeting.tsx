@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useDemo } from '../context/DemoContext';
 import { allManifestingPrograms } from '../data/manifestingCollection';
 import { getProgramCover } from '../data/coverAssets';
@@ -31,28 +32,35 @@ function ComposerPill({
   onVoiceToEve,
   placeholder = 'Message Eve…',
   style,
+  dark,
 }: {
   onTalkToEve: () => void;
   onVoiceToEve: () => void;
   placeholder?: string;
   style?: StyleProp<ViewStyle>;
+  dark?: boolean;
 }) {
+  const placeholderColor = dark ? 'rgba(255,255,255,0.65)' : colors.textMuted;
+  const iconColor = dark ? '#fff' : colors.primary;
+  const avatarBg = dark ? 'rgba(255,255,255,0.14)' : `${colors.primary}15`;
+  const micBg = dark ? 'rgba(255,255,255,0.12)' : `${colors.primary}12`;
+
   return (
     <TouchableOpacity
       style={[styles.composerPill, style]}
       onPress={onTalkToEve}
       activeOpacity={0.7}
     >
-      <View style={styles.composerAvatar}>
-        <Ionicons name="sparkles" size={14} color={colors.primary} />
+      <View style={[styles.composerAvatar, { backgroundColor: avatarBg }]}>
+        <Ionicons name="sparkles" size={14} color={iconColor} />
       </View>
-      <Text style={styles.composerPlaceholder}>{placeholder}</Text>
+      <Text style={[styles.composerPlaceholder, { color: placeholderColor }]}>{placeholder}</Text>
       <TouchableOpacity
-        style={styles.composerMic}
+        style={[styles.composerMic, { backgroundColor: micBg }]}
         onPress={onVoiceToEve}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <Ionicons name="mic" size={18} color={colors.primary} />
+        <Ionicons name="mic" size={18} color={iconColor} />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -135,131 +143,155 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
     );
   }
 
-  // Scenario 2: Type 2 first visit (no attribution)
-  if (scenarioState.isFirstVisit && !scenarioState.hasAttribution) {
+  // Scenario 2: First visit (no attribution) OR free-user — dark magic hero
+  if (
+    (scenarioState.isFirstVisit && !scenarioState.hasAttribution) ||
+    scenarioState.id === 'free-user'
+  ) {
     return (
       <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
-        <Text style={styles.welcomeHeadline}>
-          Welcome to Mindvalley, {scenarioState.userName}!
-        </Text>
-        <Text style={styles.welcomeSubhead}>Your transformation starts now.</Text>
-
-        <View style={styles.eveHeroSection}>
-          <View style={styles.eveAvatar}>
-            <Ionicons name="sparkles" size={24} color={colors.primary} />
+        <LinearGradient
+          colors={['#1A1235', '#241845', '#2E1F58']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.magicHeroCard}
+        >
+          <View style={styles.magicAvatarHalo}>
+            <LinearGradient
+              colors={['#9B8FFF', '#6C5CE7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.magicAvatar}
+            >
+              <Ionicons name="sparkles" size={30} color="#fff" />
+            </LinearGradient>
           </View>
-          <Text style={styles.eveHeroGreeting}>{scenarioState.eveGreeting}</Text>
+
+          <Text style={styles.magicGreeting}>
+            Hi {scenarioState.userName}, what brought you to Mindvalley?
+          </Text>
 
           <ComposerPill
             onTalkToEve={onTalkToEve}
             onVoiceToEve={onVoiceToEve}
+            placeholder="Type your answer…"
+            style={styles.magicComposer}
+            dark
           />
 
-          <View style={styles.chipRow}>
+          <View style={styles.magicChipRow}>
             {quickReplyChips.map((chip) => (
               <TouchableOpacity
                 key={chip}
-                style={styles.chip}
+                style={styles.magicChip}
                 onPress={() => onChipPress(chip)}
               >
-                <Text style={styles.chipText}>{chip}</Text>
+                <Text style={styles.magicChipText}>{chip}</Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </LinearGradient>
       </TouchableOpacity>
     );
   }
 
   // Scenarios 3-6: Return visits
+  const progressPercent = scenarioState.totalLessons > 0
+    ? Math.round((scenarioState.currentLesson / scenarioState.totalLessons) * 100)
+    : 0;
+
   return (
     <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
-      <Text style={styles.greeting}>Hi, {scenarioState.userName}</Text>
-
-      {/* Eve greeting card */}
-      <View style={styles.returnEveBlock}>
-        <View style={styles.returnGreetingCard}>
-          <View style={styles.eveAvatarSmall}>
-            <Ionicons name="sparkles" size={16} color={colors.primary} />
-          </View>
-          <View style={styles.returnGreetingContent}>
-            <Text style={styles.returnGreetingText}>{scenarioState.eveGreeting}</Text>
+      {/* Eve toast — tappable, opens chat */}
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={onTalkToEve}
+      >
+        <LinearGradient
+          colors={['#1A1235', '#241845', '#2E1F58']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.eveToast}
+        >
+          <LinearGradient
+            colors={['#9B8FFF', '#6C5CE7']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.eveToastIcon}
+          >
+            <Ionicons name="sparkles" size={14} color="#fff" />
+          </LinearGradient>
+          <View style={styles.eveToastBody}>
+            <Text style={styles.eveToastMessage}>{scenarioState.eveGreeting}</Text>
             {scenarioState.socialProof && (
-              <Text style={styles.socialProofText}>{scenarioState.socialProof}</Text>
+              <Text style={styles.eveToastProof}>{scenarioState.socialProof}</Text>
             )}
           </View>
-        </View>
-      </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" />
+        </LinearGradient>
+      </TouchableOpacity>
 
-      {/* Composer pill */}
-      <ComposerPill
-        onTalkToEve={onTalkToEve}
-        onVoiceToEve={onVoiceToEve}
-      />
-
-      {/* Continue program card */}
+      {/* Continue Learning card */}
       {attributedProgram && scenarioState.currentLesson > 0 && (
-        <>
-          <View style={styles.continueSectionLabel}>
-            <Ionicons name="book" size={13} color={colors.primary} />
-            <Text style={styles.continueSectionLabelText}>Learn</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.continueCard}
-            onPress={() => onStartProgram(attributedProgram.id)}
-          >
-            <Image
-              source={getProgramCover(attributedProgram.id)}
-              style={styles.continueImage}
-            />
-            <View style={styles.continueInfo}>
-              <Text style={styles.continueTitle}>{attributedProgram.title}</Text>
-              <Text style={styles.continueLesson}>
-                Lesson {scenarioState.currentLesson + 1} of {scenarioState.totalLessons}
-              </Text>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${(scenarioState.currentLesson / scenarioState.totalLessons) * 100}%` },
-                  ]}
-                />
-              </View>
+        <TouchableOpacity
+          style={[styles.featureCard, styles.featureCardLearn]}
+          onPress={() => onStartProgram(attributedProgram.id)}
+          activeOpacity={0.85}
+        >
+          <Image
+            source={getProgramCover(attributedProgram.id)}
+            style={styles.featureCardImage}
+          />
+          <View style={styles.featureCardInfo}>
+            <Text style={[styles.featureEyebrow, { color: colors.primary }]}>
+              PICK UP WHERE YOU LEFT OFF
+            </Text>
+            <Text style={styles.featureTitle} numberOfLines={1}>{attributedProgram.title}</Text>
+            <Text style={styles.featureMeta}>
+              Lesson {scenarioState.currentLesson + 1} of {scenarioState.totalLessons} · {progressPercent}%
+            </Text>
+            <View style={styles.featureProgressBar}>
+              <View
+                style={[styles.featureProgressFill, { width: `${progressPercent}%` }]}
+              />
             </View>
-            <Ionicons name="play-circle" size={36} color={colors.primary} />
-          </TouchableOpacity>
-        </>
+            <View style={[styles.featureCta, { backgroundColor: colors.primary }]}>
+              <Ionicons name="play" size={11} color="#fff" />
+              <Text style={styles.featureCtaText}>Continue Learning</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
       )}
 
-      {/* Last played meditation */}
+      {/* Continue Practice card */}
       {!scenarioState.isFirstVisit && scenarioState.currentLesson > 0 && (
-        <>
-          <View style={styles.continueSectionLabel}>
-            <Ionicons name="leaf" size={13} color={colors.teal} />
-            <Text style={[styles.continueSectionLabelText, { color: colors.teal }]}>Practice</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.continueCard}
-            onPress={() => onPlayMeditation?.(
-              'med-spirit-1',
-              '6-Phase Meditation',
-              'Vishen',
-              '/meditation-covers/6-Phase_Meditation.jpg',
-              '20 min',
-            )}
-          >
-            <Image
-              source={meditationCoversLocal['6-phase']}
-              style={styles.continueImage}
-            />
-            <View style={styles.continueInfo}>
-              <Text style={styles.continueTitle}>6-Phase Meditation</Text>
-              <Text style={styles.continueLesson}>Vishen · 20 min</Text>
-              <Text style={styles.lastPlayedHint}>Played yesterday</Text>
+        <TouchableOpacity
+          style={[styles.featureCard, styles.featureCardPractice]}
+          onPress={() => onPlayMeditation?.(
+            'med-spirit-1',
+            '6-Phase Meditation',
+            'Vishen',
+            '/meditation-covers/6-Phase_Meditation.jpg',
+            '20 min',
+          )}
+          activeOpacity={0.85}
+        >
+          <Image
+            source={meditationCoversLocal['6-phase']}
+            style={styles.featureCardImage}
+          />
+          <View style={styles.featureCardInfo}>
+            <Text style={[styles.featureEyebrow, { color: colors.teal }]}>
+              A MOMENT FOR YOURSELF
+            </Text>
+            <Text style={styles.featureTitle} numberOfLines={1}>6 Phase Meditation</Text>
+            <Text style={styles.featureMeta}>Vishen · 20 min · Played yesterday</Text>
+            <View style={[styles.featureCta, { backgroundColor: colors.teal }]}>
+              <Ionicons name="play" size={11} color="#fff" />
+              <Text style={styles.featureCtaText}>Practice Your Meditation</Text>
             </View>
-            <Ionicons name="play-circle" size={36} color={colors.teal} />
-          </TouchableOpacity>
-        </>
+          </View>
+        </TouchableOpacity>
       )}
     </TouchableOpacity>
   );
@@ -414,140 +446,196 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
-  // Eve hero (Scenario 2)
-  eveHeroSection: {
+  // Magic Eve hero (Scenario 2) — dark palette
+  magicHeroCard: {
+    borderRadius: 24,
+    paddingTop: 28,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    paddingVertical: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 143, 255, 0.22)',
+    marginBottom: 12,
+    shadowColor: '#6C5CE7',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 22,
+    elevation: 8,
   },
-  eveAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: `${colors.primary}15`,
+  magicAvatarHalo: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: 'rgba(155, 143, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(155, 143, 255, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
   },
-  eveHeroGreeting: {
+  magicAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#9B8FFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.55,
+    shadowRadius: 14,
+  },
+  magicGreeting: {
     ...typography.h3,
-    color: colors.textPrimary,
+    color: '#fff',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+    paddingHorizontal: 8,
   },
-  chipRow: {
+  magicComposer: {
+    width: '100%',
+    marginBottom: 14,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255,255,255,0.18)',
+  },
+  magicChipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     justifyContent: 'center',
   },
-  chip: {
+  magicChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    backgroundColor: `${colors.primary}12`,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: `${colors.primary}30`,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
-  chipText: {
+  magicChipText: {
     ...typography.caption,
-    color: colors.primary,
+    color: '#fff',
     fontWeight: '600',
   },
 
-  // Return visit Eve block (greeting + ask eve combined)
-  returnEveBlock: {
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-  returnGreetingCard: {
+  // Eve toast (Return visits) — dark gradient, tappable
+  eveToast: {
     flexDirection: 'row',
-    padding: 14,
-    gap: 10,
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 143, 255, 0.22)',
+    shadowColor: '#6C5CE7',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.32,
+    shadowRadius: 14,
+    elevation: 6,
   },
-  eveAvatarSmall: {
+  eveToastIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${colors.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#9B8FFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
   },
-  returnGreetingContent: {
+  eveToastBody: {
     flex: 1,
   },
-  returnGreetingText: {
+  eveToastMessage: {
     ...typography.body,
-    color: colors.textPrimary,
-    marginBottom: 4,
+    color: '#fff',
+    fontSize: 14,
+    lineHeight: 19,
   },
-  socialProofText: {
+  eveToastProof: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: 'rgba(255,255,255,0.65)',
     fontStyle: 'italic',
+    marginTop: 3,
   },
 
-  // Continue section labels
-  continueSectionLabel: {
+  // Feature cards (Continue Learning / Practice)
+  featureCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginBottom: 6,
-  },
-  continueSectionLabelText: {
-    ...typography.caption,
-    color: colors.primary,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    fontSize: 11,
-  },
-  lastPlayedHint: {
-    ...typography.caption,
-    color: colors.textMuted,
-    fontSize: 11,
-    fontStyle: 'italic',
-    marginTop: 2,
-  },
-
-  // Continue card
-  continueCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 12,
     marginBottom: 12,
-    gap: 12,
+    gap: 14,
+    overflow: 'hidden',
   },
-  continueImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
+  featureCardLearn: {
+    borderWidth: 1,
+    borderColor: `${colors.primary}25`,
+    backgroundColor: `${colors.primary}08`,
+  },
+  featureCardPractice: {
+    borderWidth: 1,
+    borderColor: `${colors.teal}25`,
+    backgroundColor: `${colors.teal}08`,
+  },
+  featureCardImage: {
+    width: 86,
+    height: 86,
+    borderRadius: 10,
     backgroundColor: colors.border,
   },
-  continueInfo: {
+  featureCardInfo: {
     flex: 1,
+    justifyContent: 'center',
   },
-  continueTitle: {
-    ...typography.label,
+  featureEyebrow: {
+    ...typography.caption,
+    fontWeight: '700',
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  featureTitle: {
+    ...typography.h4,
     color: colors.textPrimary,
+    fontWeight: '700',
     marginBottom: 2,
   },
-  continueLesson: {
+  featureMeta: {
     ...typography.caption,
     color: colors.textSecondary,
-    marginBottom: 6,
+    fontSize: 11,
+    marginBottom: 8,
   },
-  progressBar: {
+  featureProgressBar: {
     height: 4,
-    backgroundColor: colors.border,
+    backgroundColor: 'rgba(0,0,0,0.08)',
     borderRadius: 2,
+    marginBottom: 10,
   },
-  progressFill: {
+  featureProgressFill: {
     height: 4,
     backgroundColor: colors.primary,
     borderRadius: 2,
+  },
+  featureCta: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  featureCtaText: {
+    ...typography.caption,
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 12,
   },
 });
