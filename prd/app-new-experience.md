@@ -1,6 +1,6 @@
 ---
 title: "Mindvalley App: New Experience"
-slug: "mindvalley-app-new-experience"
+slug: "app-new-experience"
 scope: product
 status: discovery
 parent: null
