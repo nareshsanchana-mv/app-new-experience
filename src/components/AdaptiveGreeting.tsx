@@ -110,7 +110,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             <View style={styles.heroProgramOverlay}>
               <View>
                 <Text style={styles.heroProgramLabel}>START NOW</Text>
-                <Text style={styles.heroProgramTitle}>{attributedProgram.title}</Text>
+                <Text style={styles.heroProgramTitle}>92% of people start here</Text>
                 <Text style={styles.heroProgramAuthor}>{attributedProgram.author}</Text>
               </View>
               <View style={styles.playButton}>

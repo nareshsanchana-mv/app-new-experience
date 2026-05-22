@@ -140,29 +140,31 @@ export function NewUserExploreSection({
         <Text style={styles.sectionSubtitle}>Add another collection to your plan</Text>
       </View>
 
-      {otherCols.map((col) => {
-        const heroCover = getCollectionCover(col.slug) ?? pickHeroCoverForCollection(col);
-        return (
-          <TouchableOpacity
-            key={col.id}
-            style={styles.exploreCard}
-            onPress={() => onCollectionPress?.(col.slug)}
-            activeOpacity={0.85}
-          >
-            {heroCover ? (
-              <Image source={heroCover} style={styles.exploreCardImage} />
-            ) : (
-              <View style={[styles.exploreCardImage, { backgroundColor: col.color }]} />
-            )}
-            <View style={styles.exploreCardOverlay}>
-              <Text style={styles.exploreCardStats}>
-                {col.programCount} programs · ${col.price}/yr
-              </Text>
-              <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.85)" />
-            </View>
-          </TouchableOpacity>
-        );
-      })}
+      <View style={styles.exploreGrid}>
+        {otherCols.map((col) => {
+          const heroCover = getCollectionCover(col.slug) ?? pickHeroCoverForCollection(col);
+          return (
+            <TouchableOpacity
+              key={col.id}
+              style={styles.exploreCard}
+              onPress={() => onCollectionPress?.(col.slug)}
+              activeOpacity={0.85}
+            >
+              {heroCover ? (
+                <Image source={heroCover} style={styles.exploreCardImage} />
+              ) : (
+                <View style={[styles.exploreCardImage, { backgroundColor: col.color }]} />
+              )}
+              <View style={styles.exploreCardOverlay}>
+                <Text style={styles.exploreCardStats} numberOfLines={2}>
+                  {col.programCount} programs · ${col.price}/yr
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.85)" />
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -807,10 +809,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
   },
 
+  exploreGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 20,
+    gap: 12,
+  },
   exploreCard: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-    height: 200,
+    width: '48%',
+    height: 160,
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: colors.surface,
@@ -828,13 +835,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    gap: 8,
   },
   exploreCardStats: {
-    ...typography.label,
+    ...typography.bodySmall,
     color: '#fff',
     fontWeight: '600',
+    flex: 1,
   },
 });
