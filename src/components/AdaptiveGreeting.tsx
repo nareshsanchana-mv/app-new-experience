@@ -16,6 +16,7 @@ import { getProgramCover } from '../data/coverAssets';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { meditationCoversLocal } from '../data/coverAssets';
+import { getSoundCoverUrl } from '../data/soundCoverUrls';
 
 interface AdaptiveGreetingProps {
   onTalkToEve: () => void;
@@ -23,6 +24,7 @@ interface AdaptiveGreetingProps {
   onStartProgram: (programId: string) => void;
   onChipPress: (chip: string) => void;
   onPlayMeditation?: (id: string, title: string, author: string, image: string, duration: string) => void;
+  onPlaySound?: (id: string, title: string, author: string) => void;
 }
 
 const quickReplyChips = ['Stress relief', 'Personal growth', 'Spirituality', 'Just exploring'];
@@ -66,7 +68,7 @@ function ComposerPill({
   );
 }
 
-export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartProgram, onChipPress, onPlayMeditation }: AdaptiveGreetingProps) {
+export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartProgram, onChipPress, onPlayMeditation, onPlaySound }: AdaptiveGreetingProps) {
   const { scenarioState, toggleDemoPanel } = useDemo();
   const tapCount = useRef(0);
   const lastTap = useRef(0);
@@ -92,7 +94,33 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
   // Scenario 1: Type 1 first visit (has attribution)
   if (scenarioState.isFirstVisit && scenarioState.hasAttribution) {
     return (
-      <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
+      <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.heroZoneWrapper}>
+        <LinearGradient
+          colors={['#2E1450', '#5E2EAE', '#A03BBE']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        {/* Warm decorative glow — top right */}
+        <View style={styles.heroZoneGlowTopRight} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(245,166,35,0.55)', 'rgba(245,166,35,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroZoneGlowInner}
+          />
+        </View>
+        {/* Magenta decorative glow — bottom left */}
+        <View style={styles.heroZoneGlowBottomLeft} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroZoneGlowInner}
+          />
+        </View>
+
+        <View style={styles.heroZoneInner}>
         <Text style={styles.welcomeHeadline}>
           Welcome to Mindvalley, {scenarioState.userName}!
         </Text>
@@ -121,6 +149,78 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
           </TouchableOpacity>
         )}
 
+        {/* Quick-action row: meditation + sound to push "Your Programs" lower */}
+        <View style={styles.quickActionRow}>
+          {/* Meditation card */}
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            activeOpacity={0.85}
+            onPress={() => onPlayMeditation?.(
+              'med-6phase',
+              'The 6 Phase Meditation',
+              'Vishen',
+              '/meditation-covers/6-Phase_Meditation.jpg',
+              '20 min',
+            )}
+          >
+            <Image
+              source={meditationCoversLocal['6-phase']}
+              style={styles.quickActionImage}
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.85)']}
+              style={styles.quickActionOverlay}
+            >
+              <Text style={styles.quickActionEyebrow}>PLAY A MEDITATION</Text>
+              <Text style={styles.quickActionTitle} numberOfLines={2}>
+                The 6 Phase Meditation
+              </Text>
+              <Text style={styles.quickActionMeta}>Vishen · 20 min</Text>
+            </LinearGradient>
+            <View style={styles.quickActionPlayBadge}>
+              <Ionicons name="play" size={12} color="#000" />
+            </View>
+          </TouchableOpacity>
+
+          {/* Sound card */}
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            activeOpacity={0.85}
+            onPress={() => onPlaySound?.('snd-ocean-healing', 'Ocean Healing', 'Gabriel Loynaz')}
+          >
+            {(() => {
+              const oceanUrl = getSoundCoverUrl('Ocean Healing');
+              return oceanUrl ? (
+                <Image source={{ uri: oceanUrl }} style={styles.quickActionImage} />
+              ) : (
+                <LinearGradient
+                  colors={['#0F3D52', '#0E5A6B', '#1F8073']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.quickActionImage}
+                >
+                  <View style={styles.soundIconWrap}>
+                    <Ionicons name="musical-notes" size={40} color="rgba(255,255,255,0.35)" />
+                  </View>
+                </LinearGradient>
+              );
+            })()}
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.85)']}
+              style={styles.quickActionOverlay}
+            >
+              <Text style={styles.quickActionEyebrow}>PLAY A SOUND</Text>
+              <Text style={styles.quickActionTitle} numberOfLines={2}>
+                Ocean Healing
+              </Text>
+              <Text style={styles.quickActionMeta}>Gabriel Loynaz · soundscape</Text>
+            </LinearGradient>
+            <View style={styles.quickActionPlayBadge}>
+              <Ionicons name="play" size={12} color="#000" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.conversationStarter}>
           <View style={styles.conversationHeader}>
             <View style={styles.conversationAvatar}>
@@ -139,6 +239,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             style={styles.conversationComposer}
           />
         </View>
+        </View>
       </TouchableOpacity>
     );
   }
@@ -149,7 +250,33 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
     scenarioState.id === 'free-user'
   ) {
     return (
-      <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
+      <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.heroZoneWrapper}>
+        <LinearGradient
+          colors={['#2E1450', '#5E2EAE', '#A03BBE']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        {/* Warm decorative glow — top right */}
+        <View style={styles.heroZoneGlowTopRight} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(245,166,35,0.55)', 'rgba(245,166,35,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroZoneGlowInner}
+          />
+        </View>
+        {/* Magenta decorative glow — bottom left */}
+        <View style={styles.heroZoneGlowBottomLeft} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroZoneGlowInner}
+          />
+        </View>
+
+        <View style={styles.heroZoneInner}>
         <LinearGradient
           colors={['#1A1235', '#241845', '#2E1F58']}
           start={{ x: 0.5, y: 0 }}
@@ -191,6 +318,79 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             ))}
           </View>
         </LinearGradient>
+
+        {/* Quick-action row: meditation + sound for activation */}
+        <View style={styles.quickActionRow}>
+          {/* Meditation card */}
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            activeOpacity={0.85}
+            onPress={() => onPlayMeditation?.(
+              'med-6phase',
+              'The 6 Phase Meditation',
+              'Vishen',
+              '/meditation-covers/6-Phase_Meditation.jpg',
+              '20 min',
+            )}
+          >
+            <Image
+              source={meditationCoversLocal['6-phase']}
+              style={styles.quickActionImage}
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.85)']}
+              style={styles.quickActionOverlay}
+            >
+              <Text style={styles.quickActionEyebrow}>PLAY A MEDITATION</Text>
+              <Text style={styles.quickActionTitle} numberOfLines={2}>
+                The 6 Phase Meditation
+              </Text>
+              <Text style={styles.quickActionMeta}>Vishen · 20 min</Text>
+            </LinearGradient>
+            <View style={styles.quickActionPlayBadge}>
+              <Ionicons name="play" size={12} color="#000" />
+            </View>
+          </TouchableOpacity>
+
+          {/* Sound card */}
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            activeOpacity={0.85}
+            onPress={() => onPlaySound?.('snd-ocean-healing', 'Ocean Healing', 'Gabriel Loynaz')}
+          >
+            {(() => {
+              const oceanUrl = getSoundCoverUrl('Ocean Healing');
+              return oceanUrl ? (
+                <Image source={{ uri: oceanUrl }} style={styles.quickActionImage} />
+              ) : (
+                <LinearGradient
+                  colors={['#0F3D52', '#0E5A6B', '#1F8073']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.quickActionImage}
+                >
+                  <View style={styles.soundIconWrap}>
+                    <Ionicons name="musical-notes" size={40} color="rgba(255,255,255,0.35)" />
+                  </View>
+                </LinearGradient>
+              );
+            })()}
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.85)']}
+              style={styles.quickActionOverlay}
+            >
+              <Text style={styles.quickActionEyebrow}>PLAY A SOUND</Text>
+              <Text style={styles.quickActionTitle} numberOfLines={2}>
+                Ocean Healing
+              </Text>
+              <Text style={styles.quickActionMeta}>Gabriel Loynaz · soundscape</Text>
+            </LinearGradient>
+            <View style={styles.quickActionPlayBadge}>
+              <Ionicons name="play" size={12} color="#000" />
+            </View>
+          </TouchableOpacity>
+        </View>
+        </View>
       </TouchableOpacity>
     );
   }
@@ -201,7 +401,33 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
     : 0;
 
   return (
-    <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.container}>
+    <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.heroZoneWrapper}>
+      <LinearGradient
+        colors={['#2E1450', '#5E2EAE', '#A03BBE']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      {/* Warm decorative glow — top right */}
+      <View style={styles.heroZoneGlowTopRight} pointerEvents="none">
+        <LinearGradient
+          colors={['rgba(245,166,35,0.55)', 'rgba(245,166,35,0)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroZoneGlowInner}
+        />
+      </View>
+      {/* Magenta decorative glow — bottom left */}
+      <View style={styles.heroZoneGlowBottomLeft} pointerEvents="none">
+        <LinearGradient
+          colors={['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroZoneGlowInner}
+        />
+      </View>
+
+      <View style={styles.heroZoneInner}>
       {/* Eve toast — tappable, opens chat */}
       <TouchableOpacity
         activeOpacity={0.85}
@@ -293,6 +519,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
           </View>
         </TouchableOpacity>
       )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -317,6 +544,41 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     marginBottom: 16,
+  },
+
+  // Shared "hero zone" wrapper for first-visit scenarios (1 + 2).
+  // Vibrant Mindvalley-purple gradient, full-bleed, rounded bottom corners
+  // so the top section reads as a contained focus zone the user should
+  // engage with before scrolling to browse.
+  heroZoneWrapper: {
+    overflow: 'hidden',
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    marginBottom: 8,
+  },
+  heroZoneInner: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 20,
+  },
+  heroZoneGlowTopRight: {
+    position: 'absolute',
+    top: -80,
+    right: -80,
+    width: 280,
+    height: 280,
+  },
+  heroZoneGlowBottomLeft: {
+    position: 'absolute',
+    bottom: -100,
+    left: -80,
+    width: 260,
+    height: 260,
+  },
+  heroZoneGlowInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 140,
   },
 
   // Hero program card (Scenario 1)
@@ -404,14 +666,77 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Conversation starter frame (Scenario 1)
+  // Quick-action cards (Scenario 1) — meditation + sound
+  quickActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+  },
+  quickActionCard: {
+    width: '48.5%',
+    height: 140,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
+  quickActionImage: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  soundIconWrap: {
+    marginTop: -28,
+  },
+  quickActionOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 12,
+    paddingTop: 28,
+    paddingBottom: 12,
+  },
+  quickActionEyebrow: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  quickActionTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 18,
+    marginBottom: 2,
+  },
+  quickActionMeta: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  quickActionPlayBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Conversation starter frame (Scenario 1) — sits on the vibrant purple
+  // hero gradient, so it uses a translucent dark surface to stand out.
   conversationStarter: {
-    backgroundColor: `${colors.primary}10`,
+    backgroundColor: 'rgba(15,8,30,0.45)',
     borderWidth: 1,
-    borderColor: `${colors.primary}25`,
+    borderColor: 'rgba(255,255,255,0.14)',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 4,
     marginTop: 12,
   },
   conversationHeader: {
@@ -424,7 +749,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: `${colors.primary}20`,
+    backgroundColor: 'rgba(255,255,255,0.16)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -433,17 +758,17 @@ const styles = StyleSheet.create({
   },
   conversationTitle: {
     ...typography.h4,
-    color: colors.textPrimary,
+    color: '#FFFFFF',
     fontWeight: '700',
     marginBottom: 2,
   },
   conversationSubtitle: {
     ...typography.caption,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.75)',
   },
   conversationComposer: {
     marginBottom: 0,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255,255,255,0.95)',
   },
 
   // Magic Eve hero (Scenario 2) — dark palette
@@ -565,7 +890,7 @@ const styles = StyleSheet.create({
   featureCard: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.backgroundCard,
     borderRadius: 14,
     padding: 12,
     marginBottom: 12,
@@ -574,13 +899,13 @@ const styles = StyleSheet.create({
   },
   featureCardLearn: {
     borderWidth: 1,
-    borderColor: `${colors.primary}25`,
-    backgroundColor: `${colors.primary}08`,
+    borderColor: `${colors.primary}55`,
+    backgroundColor: colors.backgroundCard,
   },
   featureCardPractice: {
     borderWidth: 1,
-    borderColor: `${colors.teal}25`,
-    backgroundColor: `${colors.teal}08`,
+    borderColor: `${colors.teal}55`,
+    backgroundColor: colors.backgroundCard,
   },
   featureCardImage: {
     width: 86,
@@ -614,7 +939,7 @@ const styles = StyleSheet.create({
   },
   featureProgressBar: {
     height: 4,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 2,
     marginBottom: 10,
   },

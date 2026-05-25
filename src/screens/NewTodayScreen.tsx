@@ -16,6 +16,7 @@ import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
 import CollectionUpsell from '../components/CollectionUpsell';
 import { useDemo } from '../context/DemoContext';
+import { getSoundCover } from '../data/mockData';
 import { allManifestingPrograms } from '../data/manifestingCollection';
 import { browseCollections } from '../data/allCollectionsData';
 import { colors } from '../theme/colors';
@@ -117,6 +118,15 @@ export default function NewTodayScreen() {
     });
   };
 
+  const handleSoundPress = (id: string, title: string, author: string) => {
+    navigation.navigate('SoundPlayer', {
+      id,
+      title,
+      author,
+      image: getSoundCover(title) ?? '/sound-covers/Ocean_Healing.jpg',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Header />
@@ -131,6 +141,7 @@ export default function NewTodayScreen() {
           onStartProgram={handleStartProgram}
           onChipPress={handleChipPress}
           onPlayMeditation={handleMeditationPress}
+          onPlaySound={handleSoundPress}
         />
 
         {/* Divider */}

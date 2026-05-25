@@ -1,6 +1,8 @@
 // Cover image assets — local require() so they bundle into the native app.
 // Web build picks up the same files via the bundler; the previous /covers/...
 // string paths only worked on web (public/ served at root).
+import { soundCoverUrls } from './soundCoverUrls';
+
 const coverImages = {
   silvaUltramind: require('../../assets/covers/The_Silva_Ultramind_System.jpg'),
   superbrain: require('../../assets/covers/Superbrain.png'),
@@ -83,9 +85,12 @@ const soundCovers: Record<string, string> = {
   'Sagittarius': '/sound-covers/Sagittarius.jpg',
 };
 
-// Helper to get a sound cover by name (falls back to null)
+// Helper to get a sound cover by name.
+// Prefers the live Airtable URLs (from the Audiowaves CSV) which work on both
+// native and web; falls back to the legacy /sound-covers/ paths (web-only) if
+// the name isn't in the new map.
 export function getSoundCover(name: string): string | null {
-  return soundCovers[name] ?? null;
+  return soundCoverUrls[name] ?? soundCovers[name] ?? null;
 }
 
 // Meditation & sound cover images (served from public/ directory)
@@ -466,7 +471,7 @@ export const favorites = [
     id: '4',
     title: 'Leo',
     author: 'Gabriel Loynaz',
-    image: soundCovers['Leo'],
+    image: soundCoverUrls['Leo'] ?? soundCovers['Leo'],
     type: 'sound' as const,  // circular
   },
 ];
@@ -567,21 +572,21 @@ export const soundsForGoal = {
       id: '1',
       title: 'Taurus',
       author: 'Gabriel Loynaz',
-      image: soundCovers['Taurus'] ?? '/sound-covers/Taurus.jpg',
+      image: soundCoverUrls['Taurus'] ?? soundCovers['Taurus'] ?? '/sound-covers/Taurus.jpg',
       rating: 4.9,
     },
     {
       id: '2',
       title: 'Aries',
       author: 'Gabriel Loynaz',
-      image: soundCovers['Aries'] ?? '/sound-covers/Aries.jpg',
+      image: soundCoverUrls['Aries'] ?? soundCovers['Aries'] ?? '/sound-covers/Aries.jpg',
       rating: 4.8,
     },
     {
       id: '3',
       title: 'Pisces',
       author: 'Gabriel Loynaz',
-      image: soundCovers['Pisces'] ?? '/sound-covers/Pisces.jpg',
+      image: soundCoverUrls['Pisces'] ?? soundCovers['Pisces'] ?? '/sound-covers/Pisces.jpg',
       rating: 4.8,
     },
   ],
