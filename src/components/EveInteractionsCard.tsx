@@ -57,7 +57,7 @@ export default function EveInteractionsCard({
               <Text style={styles.statValue}>{chatMessages.toLocaleString()}</Text>
               <Text style={styles.statValueUnit}>chat messages</Text>
             </View>
-            <Text style={styles.statCaption}>Conversations that shaped your week</Text>
+            <Text style={styles.statCaption}>Conversations that shaped your journey</Text>
           </View>
         </View>
 
