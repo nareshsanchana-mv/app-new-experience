@@ -16,6 +16,7 @@ import { user } from '../data/mockData';
 import TransformationProgressCard from '../components/TransformationProgressCard';
 import StreakCard from '../components/StreakCard';
 import ReflectionsCard from '../components/ReflectionsCard';
+import EveInteractionsCard from '../components/EveInteractionsCard';
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
@@ -75,6 +76,9 @@ export default function ProfileScreen() {
         {/* Transformation Progress + Streak */}
         <TransformationProgressCard />
         <StreakCard />
+
+        {/* Eve interactions — chat / quizzes / content recs */}
+        <EveInteractionsCard />
 
         {/* Library */}
         <View style={styles.section}>
