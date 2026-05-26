@@ -428,34 +428,18 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
       </View>
 
       <View style={styles.heroZoneInner}>
-      {/* Eve toast — tappable, opens chat */}
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={onTalkToEve}
-      >
-        <LinearGradient
-          colors={['#1A1235', '#241845', '#2E1F58']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.eveToast}
-        >
-          <LinearGradient
-            colors={['#9B8FFF', '#6C5CE7']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.eveToastIcon}
-          >
-            <Ionicons name="sparkles" size={14} color="#fff" />
-          </LinearGradient>
-          <View style={styles.eveToastBody}>
-            <Text style={styles.eveToastMessage}>{scenarioState.eveGreeting}</Text>
-            {scenarioState.socialProof && (
-              <Text style={styles.eveToastProof}>{scenarioState.socialProof}</Text>
-            )}
-          </View>
-          <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" />
-        </LinearGradient>
-      </TouchableOpacity>
+      {/* Momentum header — only for the truly active returning case
+          (returning-inactive gets the "5 days ago" greeting from Eve below). */}
+      {scenarioState.daysInactive === 0 && scenarioState.currentLesson > 0 && (
+        <>
+          <Text style={styles.welcomeHeadline}>
+            Keep the momentum, {scenarioState.userName}
+          </Text>
+          <Text style={styles.welcomeSubhead}>
+            Day {scenarioState.currentLesson + 1} of your Silva Ultramind practice
+          </Text>
+        </>
+      )}
 
       {/* Continue Learning card */}
       {attributedProgram && scenarioState.currentLesson > 0 && (
@@ -519,6 +503,32 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
           </View>
         </TouchableOpacity>
       )}
+
+      {/* Reflect with Eve — tertiary CTA below content */}
+      <TouchableOpacity activeOpacity={0.85} onPress={onTalkToEve}>
+        <LinearGradient
+          colors={['#1A1235', '#241845', '#2E1F58']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.eveToast}
+        >
+          <LinearGradient
+            colors={['#9B8FFF', '#6C5CE7']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.eveToastIcon}
+          >
+            <Ionicons name="sparkles" size={14} color="#fff" />
+          </LinearGradient>
+          <View style={styles.eveToastBody}>
+            <Text style={styles.eveToastMessage}>Reflect on today with Eve</Text>
+            <Text style={styles.eveToastProof}>
+              A few minutes to capture what shifted
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" />
+        </LinearGradient>
+      </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
