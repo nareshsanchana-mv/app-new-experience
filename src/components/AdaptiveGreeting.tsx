@@ -319,7 +319,10 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
           </View>
         </LinearGradient>
 
-        {/* Quick-action row: meditation + sound for activation */}
+        {/* Quick-action row: meditation + sound for activation.
+            Hidden for free-user — that scenario gets its own focused
+            FreeUserContent sections below the hero zone instead. */}
+        {scenarioState.id !== 'free-user' && (
         <View style={styles.quickActionRow}>
           {/* Meditation card */}
           <TouchableOpacity
@@ -390,6 +393,7 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             </View>
           </TouchableOpacity>
         </View>
+        )}
         </View>
       </TouchableOpacity>
     );

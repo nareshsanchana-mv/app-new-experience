@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { manifestingCollection, CollectionProgram } from '../data/manifestingCollection';
 import { browseCollections, BrowseCollection, BrowseProgram } from '../data/allCollectionsData';
 import { getProgramCover, getCollectionCover } from '../data/coverAssets';
@@ -18,13 +19,14 @@ import { typography } from '../theme/typography';
 interface LearnSectionProps {
   onProgramPress: (programId: string) => void;
   onCollectionPress?: (slug: string) => void;
+  onUnlockAll?: () => void;
 }
 
-export default function LearnSection({ onProgramPress, onCollectionPress }: LearnSectionProps) {
+export default function LearnSection({ onProgramPress, onCollectionPress, onUnlockAll }: LearnSectionProps) {
   const { scenarioState } = useDemo();
 
   if (scenarioState.id === 'free-user') {
-    return <BrowseAllCollections onProgramPress={onProgramPress} />;
+    return <BrowseAllCollections onProgramPress={onProgramPress} onUnlockAll={onUnlockAll} />;
   }
 
   return <OwnedCollectionView onProgramPress={onProgramPress} />;
@@ -173,38 +175,78 @@ export function NewUserExploreSection({
 // FREE USER: Browse all 5 collections
 // ═══════════════════════════════════════════════════════════
 
-function BrowseAllCollections({ onProgramPress }: { onProgramPress: (id: string) => void }) {
+function BrowseAllCollections({
+  onProgramPress,
+  onUnlockAll,
+}: {
+  onProgramPress: (id: string) => void;
+  onUnlockAll?: () => void;
+}) {
   const totalPrograms = browseCollections.reduce((sum, c) => sum + c.programCount, 0);
 
   return (
     <View style={styles.container}>
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleRow}>
-          <View style={styles.sectionIcon}>
-            <Ionicons name="book" size={18} color={colors.primary} />
-          </View>
-          <Text style={styles.sectionTitle}>Learn</Text>
+      {/* Vibrant transformation CTA — sales pitch for unlocking all collections */}
+      <LinearGradient
+        colors={['#2E1450', '#5E2EAE', '#A03BBE']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.transformCta}
+      >
+        {/* Decorative glows */}
+        <View style={styles.transformGlowTopRight} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(245,200,66,0.45)', 'rgba(245,200,66,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.transformGlowInner}
+          />
         </View>
-        <Text style={styles.sectionSubtitle}>
-          {browseCollections.length} collections · {totalPrograms} programs
+        <View style={styles.transformGlowBottomLeft} pointerEvents="none">
+          <LinearGradient
+            colors={['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.transformGlowInner}
+          />
+        </View>
+
+        <View style={styles.transformEyebrowRow}>
+          <Ionicons name="diamond" size={14} color={colors.gold} />
+          <Text style={styles.transformEyebrow}>UNLOCK YOUR TRANSFORMATION</Text>
+        </View>
+        <Text style={styles.transformTitle}>
+          Start transforming with a Mindvalley Collection
         </Text>
-      </View>
+        <Text style={styles.transformSubtitle}>
+          {browseCollections.length} collections · {totalPrograms}+ programs · world's top teachers
+        </Text>
 
-      {/* All-access banner */}
-      <View style={styles.allAccessBanner}>
-        <View style={styles.allAccessIconContainer}>
-          <Ionicons name="diamond" size={18} color={colors.gold} />
-        </View>
-        <View style={styles.allAccessContent}>
-          <Text style={styles.allAccessTitle}>Unlock All Collections</Text>
-          <Text style={styles.allAccessSubtitle}>$299/yr per collection or $899/yr for all 5</Text>
-        </View>
-        <View style={styles.allAccessBadge}>
-          <Text style={styles.allAccessBadgeText}>Browse</Text>
-        </View>
-      </View>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={onUnlockAll}
+          style={styles.transformButtonWrap}
+        >
+          <LinearGradient
+            colors={['#FFFFFF', '#FFE9C2']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.transformButton}
+          >
+            <Text style={styles.transformButtonText}>Unlock all collections</Text>
+            <View style={styles.transformButtonPriceWrap}>
+              <Text style={styles.transformButtonPrice}>$899/yr</Text>
+            </View>
+            <Ionicons name="arrow-forward" size={18} color="#1A0B2E" />
+          </LinearGradient>
+        </TouchableOpacity>
 
-      {/* Collection rows */}
+        <Text style={styles.transformFinePrint}>
+          Or $299/yr per collection · cancel anytime
+        </Text>
+      </LinearGradient>
+
+      {/* Collection rows below as the showcase */}
       {browseCollections.map((collection) => (
         <CollectionRow
           key={collection.id}
@@ -470,50 +512,102 @@ const styles = StyleSheet.create({
     marginLeft: 42,
   },
 
-  // === All-access banner (free user) ===
-  allAccessBanner: {
+  // === Vibrant transformation CTA (free user) ===
+  transformCta: {
+    marginHorizontal: 20,
+    marginBottom: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 22,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(245,200,66,0.30)',
+    overflow: 'hidden',
+  },
+  transformGlowTopRight: {
+    position: 'absolute',
+    top: -80,
+    right: -80,
+    width: 240,
+    height: 240,
+  },
+  transformGlowBottomLeft: {
+    position: 'absolute',
+    bottom: -100,
+    left: -80,
+    width: 220,
+    height: 220,
+  },
+  transformGlowInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 140,
+  },
+  transformEyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.backgroundElevated,
-    marginHorizontal: 20,
-    marginBottom: 16,
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: `${colors.gold}30`,
-    gap: 12,
+    gap: 6,
+    marginBottom: 8,
   },
-  allAccessIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: `${colors.gold}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  allAccessContent: {
-    flex: 1,
-  },
-  allAccessTitle: {
-    ...typography.h4,
+  transformEyebrow: {
     color: colors.gold,
-    fontWeight: '700',
-  },
-  allAccessSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  allAccessBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: `${colors.gold}20`,
-    borderRadius: 12,
-  },
-  allAccessBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: colors.gold,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+  },
+  transformTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    lineHeight: 28,
+    marginBottom: 8,
+  },
+  transformSubtitle: {
+    color: 'rgba(255,255,255,0.78)',
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 20,
+    lineHeight: 18,
+  },
+  transformButtonWrap: {
+    borderRadius: 999,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  transformButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  transformButtonText: {
+    color: '#1A0B2E',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  transformButtonPriceWrap: {
+    backgroundColor: 'rgba(26,11,46,0.10)',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  transformButtonPrice: {
+    color: '#1A0B2E',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  transformFinePrint: {
+    color: 'rgba(255,255,255,0.60)',
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 12,
   },
 
   // === Collection row (free user) ===

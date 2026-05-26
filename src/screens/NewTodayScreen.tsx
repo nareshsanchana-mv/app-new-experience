@@ -12,6 +12,7 @@ import Header from '../components/Header';
 import AdaptiveGreeting from '../components/AdaptiveGreeting';
 import LearnSection, { NewUserOwnedSection, NewUserExploreSection } from '../components/LearnSection';
 import PracticeSection from '../components/PracticeSection';
+import FreeUserContent from '../components/FreeUserContent';
 import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
 import CollectionUpsell from '../components/CollectionUpsell';
@@ -164,16 +165,26 @@ export default function NewTodayScreen() {
           </>
         ) : (
           <>
-            {/* Learn Section — Collection Curriculum */}
-            <LearnSection
+            {/* Free content focus: 3 sample sections to drive activation
+                before exposing the full collection browse. */}
+            <FreeUserContent
               onProgramPress={handleProgramPress}
-              onCollectionPress={handleCollectionPress}
+              onPlayMeditation={handleMeditationPress}
+              onPlaySound={handleSoundPress}
             />
 
             <View style={styles.divider} />
 
-            {/* Practice Section — Meditation Library */}
-            <PracticeSection onMeditationPress={handleMeditationPress} />
+            {/* Browse-all-collections rail kept as the explore tail
+                (upsell-aware — each collection shows price). */}
+            <LearnSection
+              onProgramPress={handleProgramPress}
+              onCollectionPress={handleCollectionPress}
+              onUnlockAll={() => {
+                setUpsellCollection('manifesting');
+                setShowUpsell(true);
+              }}
+            />
           </>
         )}
 
