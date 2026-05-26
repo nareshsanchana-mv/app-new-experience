@@ -40,8 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# Bulk cover downloads (only referenced files are tracked)
-assets/covers/
-assets/meditation-covers/
+# Bulk cover-download helper scripts (one-off generators)
 download-covers.js
 download-meditation-covers.js
