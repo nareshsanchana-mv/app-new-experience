@@ -36,7 +36,7 @@ export type RootStackParamList = {
     id: string;
     title: string;
     author: string;
-    image: string;
+    image: string | number; // string URL (legacy / web) or require()'d asset id
     rating?: number;
   };
   ShortsPlayer: {

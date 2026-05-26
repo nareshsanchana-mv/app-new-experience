@@ -189,9 +189,9 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             onPress={() => onPlaySound?.('snd-ocean-healing', 'Ocean Healing', 'Gabriel Loynaz')}
           >
             {(() => {
-              const oceanUrl = getSoundCoverUrl('Ocean Healing');
-              return oceanUrl ? (
-                <Image source={{ uri: oceanUrl }} style={styles.quickActionImage} />
+              const oceanCover = getSoundCoverUrl('Ocean Healing');
+              return oceanCover ? (
+                <Image source={oceanCover} style={styles.quickActionImage} />
               ) : (
                 <LinearGradient
                   colors={['#0F3D52', '#0E5A6B', '#1F8073']}
@@ -359,9 +359,9 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
             onPress={() => onPlaySound?.('snd-ocean-healing', 'Ocean Healing', 'Gabriel Loynaz')}
           >
             {(() => {
-              const oceanUrl = getSoundCoverUrl('Ocean Healing');
-              return oceanUrl ? (
-                <Image source={{ uri: oceanUrl }} style={styles.quickActionImage} />
+              const oceanCover = getSoundCoverUrl('Ocean Healing');
+              return oceanCover ? (
+                <Image source={oceanCover} style={styles.quickActionImage} />
               ) : (
                 <LinearGradient
                   colors={['#0F3D52', '#0E5A6B', '#1F8073']}

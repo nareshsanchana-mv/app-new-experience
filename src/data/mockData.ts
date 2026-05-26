@@ -86,10 +86,13 @@ const soundCovers: Record<string, string> = {
 };
 
 // Helper to get a sound cover by name.
-// Prefers the live Airtable URLs (from the Audiowaves CSV) which work on both
-// native and web; falls back to the legacy /sound-covers/ paths (web-only) if
-// the name isn't in the new map.
-export function getSoundCover(name: string): string | null {
+// Returns the bundled require()'d local asset (a Metro module-id number)
+// from soundCoverUrls when available, or the legacy /sound-covers/ string
+// path (web-only) as a fallback.
+//
+// Consumers that render via <Image> should pick the right source shape:
+//   source={typeof v === 'string' ? { uri: v } : v}
+export function getSoundCover(name: string): number | string | null {
   return soundCoverUrls[name] ?? soundCovers[name] ?? null;
 }
 

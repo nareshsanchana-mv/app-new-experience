@@ -65,7 +65,7 @@ export default function SoundPlayerScreen() {
             {/* Album Artwork - Circular */}
             <View style={styles.artworkContainer}>
               <Image
-                source={{ uri: image }}
+                source={typeof image === 'string' ? { uri: image } : (image as any)}
                 style={styles.artwork}
               />
               <View style={styles.artworkOverlay}>
