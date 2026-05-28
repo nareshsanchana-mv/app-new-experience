@@ -151,15 +151,15 @@ export function getCollectionCover(slug: string): any {
 import { meditationCoverUrls } from './meditationCoverUrls';
 
 export const meditationCoversLocal: Record<string, any> = {
-  'profound-sleep': require('../../assets/meditation-covers/Profound_Sleep.jpg'),
-  'deep-relaxation': require('../../assets/meditation-covers/Deep_Relaxation.jpg'),
-  'sink-back': require('../../assets/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg'),
-  'releasing-anxiety': require('../../assets/meditation-covers/Releasing_Anxiety.jpg'),
-  'clarity-vision': require('../../assets/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg'),
-  'abundance': require('../../assets/meditation-covers/Abundance_Meditation.jpg'),
+  'profound-sleep': require('../../assets/meditation-covers/profound_sleep.jpg'),
+  'deep-relaxation': require('../../assets/meditation-covers/deep_relaxation.jpg'),
+  'sink-back': require('../../assets/meditation-covers/sink_back_into_deeper_sleep.jpg'),
+  'releasing-anxiety': require('../../assets/meditation-covers/releasing_anxiety.jpg'),
+  'clarity-vision': require('../../assets/meditation-covers/clarity_of_vision_the_path_to_your_dreams.jpg'),
+  'abundance': require('../../assets/meditation-covers/abundance_meditation.jpg'),
   '6-phase': require('../../assets/meditation-covers/6_phase_meditation.jpg'),
-  'manifesting-hwl': require('../../assets/meditation-covers/Manifesting_Health_Wealth_Love.jpg'),
-  'sleep-body-scan': require('../../assets/meditation-covers/Sleep_Inducing_Body_Scan.jpg'),
+  'manifesting-hwl': require('../../assets/meditation-covers/manifesting_health_wealth_love.jpg'),
+  'sleep-body-scan': require('../../assets/meditation-covers/sleep_inducing_body_scan.jpg'),
   // The legacy "Third Eye Chakra: Intuition & Wisdom" title isn't in the new CSV;
   // closest match is "Third Eye Chakra Sounding: Intuition & Wisdom".
   'third-eye': require('../../assets/meditation-covers/third_eye_chakra_sounding_intuition_wisdom.jpg'),
@@ -168,14 +168,14 @@ export const meditationCoversLocal: Record<string, any> = {
 // Path-to-require map for meditation covers (maps the legacy string paths used
 // in meditationLibrary.ts to the new lowercase slug files).
 const meditationCoversByPath: Record<string, any> = {
-  '/meditation-covers/Profound_Sleep.jpg': require('../../assets/meditation-covers/Profound_Sleep.jpg'),
-  '/meditation-covers/Deep_Relaxation.jpg': require('../../assets/meditation-covers/Deep_Relaxation.jpg'),
-  '/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg': require('../../assets/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg'),
-  '/meditation-covers/Releasing_Anxiety.jpg': require('../../assets/meditation-covers/Releasing_Anxiety.jpg'),
-  '/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg': require('../../assets/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg'),
-  '/meditation-covers/Abundance_Meditation.jpg': require('../../assets/meditation-covers/Abundance_Meditation.jpg'),
+  '/meditation-covers/Profound_Sleep.jpg': require('../../assets/meditation-covers/profound_sleep.jpg'),
+  '/meditation-covers/Deep_Relaxation.jpg': require('../../assets/meditation-covers/deep_relaxation.jpg'),
+  '/meditation-covers/Sink_Back_Into_Deeper_Sleep.jpg': require('../../assets/meditation-covers/sink_back_into_deeper_sleep.jpg'),
+  '/meditation-covers/Releasing_Anxiety.jpg': require('../../assets/meditation-covers/releasing_anxiety.jpg'),
+  '/meditation-covers/Clarity_of_Vision_The_Path_to_Your_Dreams.jpg': require('../../assets/meditation-covers/clarity_of_vision_the_path_to_your_dreams.jpg'),
+  '/meditation-covers/Abundance_Meditation.jpg': require('../../assets/meditation-covers/abundance_meditation.jpg'),
   '/meditation-covers/6-Phase_Meditation.jpg': require('../../assets/meditation-covers/6_phase_meditation.jpg'),
-  '/meditation-covers/Manifesting_Health_Wealth_Love.jpg': require('../../assets/meditation-covers/Manifesting_Health_Wealth_Love.jpg'),
+  '/meditation-covers/Manifesting_Health_Wealth_Love.jpg': require('../../assets/meditation-covers/manifesting_health_wealth_love.jpg'),
 };
 
 // Helper to get program cover by id
