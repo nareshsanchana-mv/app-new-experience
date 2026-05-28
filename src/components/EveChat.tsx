@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -11,14 +12,23 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDemo } from '../context/DemoContext';
+import { getProgramCover } from '../data/coverAssets';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+
+interface RecBadge {
+  programId?: string;
+  title: string;
+  author?: string;
+  owned: boolean;
+  collection?: string;
+}
 
 interface ChatMessage {
   id: string;
   sender: 'eve' | 'user';
   text: string;
-  badges?: { title: string; owned: boolean; collection?: string }[];
+  badges?: RecBadge[];
 }
 
 interface EveChatProps {
@@ -115,22 +125,37 @@ export default function EveChat({ onClose, initialMessage, startInVoiceMode }: E
               </Text>
               {msg.badges && msg.badges.length > 0 && (
                 <View style={styles.badgeList}>
-                  {msg.badges.map((badge, i) => (
-                    <View key={i} style={styles.badgeRow}>
-                      <View style={[
-                        styles.badge,
-                        badge.owned ? styles.badgeOwned : styles.badgeUnowned,
-                      ]}>
-                        <Text style={[
-                          styles.badgeText,
-                          badge.owned ? styles.badgeTextOwned : styles.badgeTextUnowned,
-                        ]}>
-                          {badge.owned ? 'Included' : badge.collection}
-                        </Text>
+                  {msg.badges.map((badge, i) => {
+                    const cover = badge.programId ? getProgramCover(badge.programId) : null;
+                    return (
+                      <View key={i} style={styles.recCard}>
+                        {cover ? (
+                          <Image source={cover} style={styles.recCover} />
+                        ) : (
+                          <View style={[styles.recCover, styles.recCoverPlaceholder]}>
+                            <Ionicons name="image-outline" size={20} color={colors.textMuted} />
+                          </View>
+                        )}
+                        <View style={styles.recBody}>
+                          <Text style={styles.recTitle} numberOfLines={2}>{badge.title}</Text>
+                          {!!badge.author && (
+                            <Text style={styles.recAuthor} numberOfLines={1}>{badge.author}</Text>
+                          )}
+                          <View style={[
+                            styles.badge,
+                            badge.owned ? styles.badgeOwned : styles.badgeUnowned,
+                          ]}>
+                            <Text style={[
+                              styles.badgeText,
+                              badge.owned ? styles.badgeTextOwned : styles.badgeTextUnowned,
+                            ]}>
+                              {badge.owned ? 'Included' : badge.collection}
+                            </Text>
+                          </View>
+                        </View>
                       </View>
-                      <Text style={styles.badgeTitle}>{badge.title}</Text>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               )}
             </View>
@@ -186,8 +211,55 @@ export default function EveChat({ onClose, initialMessage, startInVoiceMode }: E
   );
 }
 
+// Quick-reply chips from the magic-Eve hero map to curated rec sets so the
+// chat opens with a real, content-rich response instead of a placeholder.
+const CHIP_RECS: Record<string, { reply: string; badges: RecBadge[] }> = {
+  'Stress relief': {
+    reply: "I hear you — let's start there. These three are loved by members navigating high-pressure moments:",
+    badges: [
+      { programId: 'hbo', title: 'Healing Burnout', author: 'Dr. Romie Mushtaq', owned: false, collection: 'Longevity' },
+      { programId: 'css', title: 'Calm Mind', author: 'Dr. Caroline Leaf', owned: false, collection: 'Longevity' },
+      { programId: '6pm', title: 'The 6 Phase Meditation', author: 'Vishen Lakhiani', owned: false, collection: 'Manifesting' },
+    ],
+  },
+  'Personal growth': {
+    reply: "Beautiful — growth is where transformation lives. Here's a great starting trio:",
+    badges: [
+      { programId: 'tqpm', title: 'The Quest for Personal Mastery', author: 'Srikumar Rao', owned: false, collection: 'Manifesting' },
+      { programId: 'mgm', title: 'Mastering the Growth Mindset', author: 'Vishen Lakhiani', owned: false, collection: 'Exponential Entrepreneur' },
+      { programId: 'hof', title: 'The Habit of Ferocity', author: 'Steven Kotler', owned: false, collection: 'Exponential Entrepreneur' },
+    ],
+  },
+  'Spirituality': {
+    reply: 'For going inward — three programs that meet you wherever you are on the path:',
+    badges: [
+      { programId: '6pm', title: 'The 6 Phase Meditation', author: 'Vishen Lakhiani', owned: false, collection: 'Manifesting' },
+      { programId: 'eb', title: 'Everyday Bliss', author: 'Paul McKenna', owned: false, collection: 'Manifesting' },
+      { programId: 'rtha', title: 'Rapid Transformational Hypnotherapy for Abundance', author: 'Marisa Peer', owned: false, collection: 'Manifesting' },
+    ],
+  },
+  'Just exploring': {
+    reply: 'Love it. Here are three doorways to peek through — each one opens to something different:',
+    badges: [
+      { programId: 'ul-mp', title: 'Uncompromised Life', author: 'Marisa Peer', owned: false, collection: 'Manifesting' },
+      { programId: '3miq', title: 'The 3 Most Important Questions', author: 'Vishen Lakhiani', owned: false, collection: 'Manifesting' },
+      { programId: 'ml', title: 'Magical Living', author: 'Tim Storey', owned: false, collection: 'Manifesting' },
+    ],
+  },
+};
+
 // Pre-scripted conversations per scenario
 function getInitialMessages(scenarioId: string, userName: string, initialMessage?: string): ChatMessage[] {
+  // Chip path: seed a 3-message convo so the chat opens with concrete recs.
+  if (initialMessage && CHIP_RECS[initialMessage]) {
+    const { reply, badges } = CHIP_RECS[initialMessage];
+    return [
+      { id: 'eve-1', sender: 'eve', text: `Hi ${userName}! What brought you to Mindvalley today?` },
+      { id: 'user-1', sender: 'user', text: initialMessage },
+      { id: 'eve-2', sender: 'eve', text: reply, badges },
+    ];
+  }
+
   if (scenarioId === 'new-user-no-attribution') {
     return [
       {
@@ -352,14 +424,52 @@ const styles = StyleSheet.create({
   },
   badgeList: {
     marginTop: 10,
-    gap: 6,
+    gap: 10,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
+  recCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  recCover: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    backgroundColor: colors.surface,
+  },
+  recCoverPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recBody: {
+    flex: 1,
+    gap: 2,
+  },
+  recTitle: {
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    lineHeight: 17,
+  },
+  recAuthor: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
   badge: {
+    alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,

@@ -67,7 +67,9 @@ export default function NewTodayScreen() {
   };
 
   const handleChipPress = (chip: string) => {
-    setEveChatInitialMessage(`I'm interested in: ${chip}`);
+    // Pass the chip verbatim — EveChat detects known chips and seeds the
+    // conversation with category-specific recommendations.
+    setEveChatInitialMessage(chip);
     setEveChatVoiceMode(false);
     setShowEveChat(true);
   };
