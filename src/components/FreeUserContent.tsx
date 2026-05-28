@@ -118,9 +118,14 @@ export default function FreeUserContent({ onProgramPress, onPlayMeditation, onPl
                   colors={['transparent', 'rgba(0,0,0,0.85)']}
                   style={styles.cardOverlay}
                 >
-                  <View style={styles.durationPill}>
-                    <Ionicons name="time-outline" size={10} color="#fff" />
-                    <Text style={styles.durationPillText}>{m.duration}</Text>
+                  <View style={styles.metaPillRow}>
+                    <View style={[styles.freeBadge, styles.freeBadgeInRow]}>
+                      <Text style={styles.freeBadgeText}>FREE</Text>
+                    </View>
+                    <View style={styles.durationPill}>
+                      <Ionicons name="time-outline" size={10} color="#fff" />
+                      <Text style={styles.durationPillText}>{m.duration}</Text>
+                    </View>
                   </View>
                   <Text style={styles.cardTitle} numberOfLines={2}>{m.title}</Text>
                   <Text style={styles.cardMeta} numberOfLines={1}>{m.author}</Text>
@@ -164,6 +169,9 @@ export default function FreeUserContent({ onProgramPress, onPlayMeditation, onPl
                     style={styles.soundImage}
                   />
                 )}
+                <View style={[styles.freeBadge, styles.soundFreeBadge]}>
+                  <Text style={styles.freeBadgeText}>FREE</Text>
+                </View>
                 <View style={styles.playBadgeSmall}>
                   <Ionicons name="play" size={11} color="#000" />
                 </View>
@@ -345,6 +353,12 @@ const styles = StyleSheet.create({
   },
 
   // Badges
+  metaPillRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
   freeBadge: {
     alignSelf: 'flex-start',
     backgroundColor: colors.gold,
@@ -359,6 +373,15 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.5,
   },
+  freeBadgeInRow: {
+    marginBottom: 0,
+  },
+  soundFreeBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    marginBottom: 0,
+  },
   durationPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -368,7 +391,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 8,
-    marginBottom: 6,
   },
   durationPillText: {
     color: '#fff',

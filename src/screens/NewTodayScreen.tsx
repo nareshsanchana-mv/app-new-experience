@@ -12,6 +12,8 @@ import Header from '../components/Header';
 import AdaptiveGreeting from '../components/AdaptiveGreeting';
 import LearnSection, { NewUserOwnedSection, NewUserExploreSection } from '../components/LearnSection';
 import PracticeSection from '../components/PracticeSection';
+import StreakBrokenCard from '../components/StreakBrokenCard';
+import ReferAFriendCard from '../components/ReferAFriendCard';
 import FreeUserContent from '../components/FreeUserContent';
 import DemoPanel from '../components/DemoPanel';
 import EveChat from '../components/EveChat';
@@ -150,6 +152,21 @@ export default function NewTodayScreen() {
 
         {scenarioState.id !== 'free-user' ? (
           <>
+            {/* Returning-inactive: streak-broken state with social proof,
+                bridging the focus section above and Your Programs below. */}
+            {scenarioState.id === 'returning-inactive' && (
+              <StreakBrokenCard
+                lastStreak={7}
+                daysSince={scenarioState.daysInactive}
+              />
+            )}
+
+            {/* Returning-active: refer-a-friend nudge (renewal discount).
+                Subscribed users only — never shown to free users. */}
+            {scenarioState.id === 'returning-active' && (
+              <ReferAFriendCard />
+            )}
+
             {/* Programs — owned Manifesting collection */}
             <NewUserOwnedSection onProgramPress={handleProgramPress} />
 

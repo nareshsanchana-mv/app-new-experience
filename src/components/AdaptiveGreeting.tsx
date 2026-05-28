@@ -404,27 +404,54 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
     ? Math.round((scenarioState.currentLesson / scenarioState.totalLessons) * 100)
     : 0;
 
+  // Hero palette shifts with the user's state:
+  //   active   → green/teal (healthy momentum)
+  //   inactive → amber (warm, gentle nudge to return)
+  //   default  → brand purple (new-user vibe)
+  const isReturningActive =
+    scenarioState.daysInactive === 0 && scenarioState.currentLesson > 0;
+  const isReturningInactive =
+    scenarioState.daysInactive > 0 && scenarioState.currentLesson > 0;
+
+  const heroPalette = isReturningActive
+    ? {
+        base: ['#0B2E2A', '#155F4F', '#00A37E'] as const,
+        glowTopRight: ['rgba(0,212,170,0.55)', 'rgba(0,212,170,0)'] as const,
+        glowBottomLeft: ['rgba(155,255,200,0.32)', 'rgba(155,255,200,0)'] as const,
+      }
+    : isReturningInactive
+    ? {
+        base: ['#2E1A0F', '#6E4220', '#C97A2E'] as const,
+        glowTopRight: ['rgba(245,166,35,0.60)', 'rgba(245,166,35,0)'] as const,
+        glowBottomLeft: ['rgba(255,107,107,0.35)', 'rgba(255,107,107,0)'] as const,
+      }
+    : {
+        base: ['#2E1450', '#5E2EAE', '#A03BBE'] as const,
+        glowTopRight: ['rgba(245,166,35,0.55)', 'rgba(245,166,35,0)'] as const,
+        glowBottomLeft: ['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)'] as const,
+      };
+
   return (
     <TouchableOpacity activeOpacity={1} onPress={handleTripleTap} style={styles.heroZoneWrapper}>
       <LinearGradient
-        colors={['#2E1450', '#5E2EAE', '#A03BBE']}
+        colors={heroPalette.base}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
-      {/* Warm decorative glow — top right */}
+      {/* Decorative glow — top right (palette-driven) */}
       <View style={styles.heroZoneGlowTopRight} pointerEvents="none">
         <LinearGradient
-          colors={['rgba(245,166,35,0.55)', 'rgba(245,166,35,0)']}
+          colors={heroPalette.glowTopRight}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroZoneGlowInner}
         />
       </View>
-      {/* Magenta decorative glow — bottom left */}
+      {/* Decorative glow — bottom left (palette-driven) */}
       <View style={styles.heroZoneGlowBottomLeft} pointerEvents="none">
         <LinearGradient
-          colors={['rgba(224,64,251,0.40)', 'rgba(224,64,251,0)']}
+          colors={heroPalette.glowBottomLeft}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroZoneGlowInner}
@@ -440,6 +467,19 @@ export default function AdaptiveGreeting({ onTalkToEve, onVoiceToEve, onStartPro
           </Text>
           <Text style={styles.welcomeSubhead}>
             Day {scenarioState.currentLesson + 1} of your Silva Ultramind practice
+          </Text>
+        </>
+      )}
+
+      {/* Returning-inactive: warm welcome-back headline at the very top
+          so the focus section opens with a human moment before the recap. */}
+      {scenarioState.daysInactive > 0 && scenarioState.currentLesson > 0 && (
+        <>
+          <Text style={styles.welcomeHeadline}>
+            Welcome back, {scenarioState.userName}
+          </Text>
+          <Text style={styles.welcomeSubhead}>
+            Let's pick up where you left off.
           </Text>
         </>
       )}

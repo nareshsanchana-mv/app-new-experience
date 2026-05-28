@@ -310,7 +310,9 @@ interface BrowseProgramCardProps {
 }
 
 function BrowseProgramCard({ program, collectionColor, onPress }: BrowseProgramCardProps) {
+  const { scenarioState } = useDemo();
   const cover = getProgramCover(program.id);
+  const showLock = scenarioState.id === 'free-user';
 
   return (
     <TouchableOpacity
@@ -328,6 +330,11 @@ function BrowseProgramCard({ program, collectionColor, onPress }: BrowseProgramC
           <Text style={[styles.placeholderTitle, { color: collectionColor }]} numberOfLines={2}>
             {program.title}
           </Text>
+        </View>
+      )}
+      {showLock && (
+        <View style={styles.lockBadge} pointerEvents="none">
+          <Ionicons name="lock-closed" size={12} color="#FFFFFF" />
         </View>
       )}
       <View style={styles.programInfo}>
@@ -785,6 +792,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     backgroundColor: colors.border,
+  },
+  lockBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   progressBarContainer: {
     height: 3,
